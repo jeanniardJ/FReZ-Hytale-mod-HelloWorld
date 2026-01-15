@@ -1,17 +1,17 @@
 {
-  "Group": "TemplatePlugin",
-  "Name": "TemplatePlugin",
+  "Group": "Jjeanniard",
+  "Name": "HelloWorld",
   "Version": "1.0.0",
-  "Description": "A Hytale plugin template",
+  "Description": "A Hytale plugin",
   "Authors": [
     {
-      "Name": "YourName",
-      "Email": "your.email@example.com",
-      "Url": "https://your-website.com"
+      "Name": "Jjeanniard",
+      "Email": "jonathan@jonathanjeanniard.me",
+      "Url": "https://jonathanjeanniard.me"
     }
   ],
-  "Website": "https://github.com/yourusername/hytale-plugin-template",
-  "Main": "com.example.templateplugin.TemplatePlugin",
+  "Website": "https://github.com/Jjeanniard",
+  "Main": "com.jjeanniard.mods.HelloWorld",
   "ServerVersion": "*",
   "Dependencies": {},
   "OptionalDependencies": {},
