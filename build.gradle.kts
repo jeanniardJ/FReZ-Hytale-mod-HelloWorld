@@ -4,7 +4,7 @@ plugins {
     id("run-hytale")
 }
 
-group = findProperty("pluginGroup") as String? ?: "com.example"
+group = findProperty("pluginGroup") as String? ?: "com.jjeanniard"
 version = findProperty("pluginVersion") as String? ?: "1.0.0"
 description = findProperty("pluginDescription") as String? ?: "A Hytale plugin template"
 
@@ -19,7 +19,6 @@ dependencies {
     
     // Common dependencies (will be bundled in JAR)
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation("org.jetbrains:annotations:24.1.0")
     
     // Test dependencies
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
@@ -64,7 +63,7 @@ tasks {
         archiveClassifier.set("")
         
         // Relocate dependencies to avoid conflicts
-        relocate("com.google.gson", "com.yourplugin.libs.gson")
+        relocate("com.google.gson", "com.jjeanniard.libs.gson")
         
         // Minimize JAR size (removes unused classes)
         minimize()
