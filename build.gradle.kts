@@ -1,25 +1,31 @@
 plugins {
-    id("java-library")
+    id("java")
+    id("org.jetbrains.gradle.plugin.idea-ext") version "1.3"
     id("com.gradleup.shadow") version "9.3.1"
     id("run-hytale")
 }
 
-group = findProperty("pluginGroup") as String? ?: "com.jjeanniard"
+group = findProperty("pluginGroup") as String? ?: "com.jjeanniard.plugins"
 version = findProperty("pluginVersion") as String? ?: "1.0.0"
 description = findProperty("pluginDescription") as String? ?: "A Hytale plugin template"
 
 repositories {
-    mavenLocal()
     mavenCentral()
+    maven {
+        name = "hytale"
+        url = uri("https://repo.hytale.com/releases")
+    }
 }
 
 dependencies {
+    //compileOnly("com.hytale:server-api:1.0.0")
     // Hytale Server API (provided by server at runtime)
     compileOnly(files("./libs/HytaleServer.jar"))
-    
+
     // Common dependencies (will be bundled in JAR)
+    implementation("com.google.guava:guava:32.1.3-jre")
     implementation("com.google.code.gson:gson:2.10.1")
-    
+
     // Test dependencies
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -39,11 +45,11 @@ tasks {
         options.encoding = Charsets.UTF_8.name()
         options.release = 25
     }
-    
+
     // Configure resource processing
     processResources {
         filteringCharset = Charsets.UTF_8.name()
-        
+
         // Replace placeholders in manifest.json
         val props = mapOf(
             "group" to project.group,
@@ -51,29 +57,29 @@ tasks {
             "description" to project.description
         )
         inputs.properties(props)
-        
+
         filesMatching("manifest.json") {
             expand(props)
         }
     }
-    
+
     // Configure ShadowJar (bundle dependencies)
     shadowJar {
         archiveBaseName.set(rootProject.name)
         archiveClassifier.set("")
-        
+
         // Relocate dependencies to avoid conflicts
-        relocate("com.google.gson", "com.jjeanniard.libs.gson")
-        
+        relocate("com.google.gson", "com.example.myplugin.libs.gson")
+
         // Minimize JAR size (removes unused classes)
         minimize()
     }
-    
+
     // Configure tests
     test {
         useJUnitPlatform()
     }
-    
+
     // Make build depend on shadowJar
     build {
         dependsOn(shadowJar)

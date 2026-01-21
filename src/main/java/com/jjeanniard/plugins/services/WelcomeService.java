@@ -1,13 +1,14 @@
-package com.jjeanniard.mods;
+package com.jjeanniard.plugins.services;
+
+import com.jjeanniard.plugins.config.MyConfig;
 
 public final class WelcomeService {
     private final String firstJoinMessage;
     private final String rejoinMessage;
 
     public WelcomeService(MyConfig config) {
-        
-        this.firstJoinMessage = config.getFirstJoinMessage();
-        this.rejoinMessage = config.getRejoinMessage();
+        this.firstJoinMessage = config.welcome.firstJoin;
+        this.rejoinMessage = config.welcome.rejoin;
     }
 
     public String getWelcomeMessage(boolean isFirstJoin) {

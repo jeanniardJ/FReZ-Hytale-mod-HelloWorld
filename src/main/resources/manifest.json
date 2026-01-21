@@ -11,7 +11,7 @@
     }
   ],
   "Website": "https://github.com/Jjeanniard",
-  "Main": "com.jjeanniard.mods.HelloWorld",
+  "Main": "com.jjeanniard.plugins.HelloWorld",
   "ServerVersion": "*",
   "Dependencies": {},
   "OptionalDependencies": {},

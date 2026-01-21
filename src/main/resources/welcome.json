@@ -1,0 +1,14 @@
+{
+  "Welcome": {
+    "FirstJoin": "🎉 Bienvenue {player} sur le serveur !",
+    "Rejoin": "👋 Re-bonjour {player}, content de te revoir !"
+  },
+  "Announcements": {
+    "CooldownSeconds": 300,
+    "Messages": [
+      "🌟 Astuce: Vérifiez votre inventaire avant l'exploration !",
+      "⚔️ Événement: Donjon communautaire ce soir à 21h",
+      "📢 Maintenance prévue demain 04h00"
+    ]
+  }
+}
