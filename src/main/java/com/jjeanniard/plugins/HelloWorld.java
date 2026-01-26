@@ -13,51 +13,98 @@ import com.jjeanniard.plugins.services.WelcomeService;
 
 import javax.annotation.Nonnull;
 
+/**
+ * Point d'entrée principal du plugin.
+ * C'est ici que Hytale charge et lance notre code.
+ */
 public class HelloWorld extends JavaPlugin {
+    // Le Logger permet d'écrire dans la console du serveur de manière propre.
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
     
+    // Instance unique du plugin (Singleton) accessible partout.
+    private static HelloWorld instance;
+
+    // Conteneur de la configuration (ne contient pas encore les données au début).
     private final Config<MyConfig> config;
+    
+    // Nos services (logique métier).
     private GlobalAnnouncementService announcementService;
 
+    /**
+     * Constructeur : Appelé quand Hytale DÉCOUVRE le plugin (avant le démarrage du serveur).
+     * Règle d'or : Ne jamais lancer de logique lourde ici. On ne fait qu'enregistrer les fichiers.
+     */
     public HelloWorld(@Nonnull JavaPluginInit init) {
         super(init);
-        // Enregistrement de la configuration
+        
+        // On sauvegarde l'instance pour pouvoir y accéder via getInstance()
+        instance = this;
+        
+        // On dit à Hytale : "Ce plugin utilise un fichier 'welcome.json' qui respecte le format défini dans MyConfig.CODEC".
+        // Note : À ce stade, le fichier n'est pas encore lu !
         this.config = withConfig("welcome", MyConfig.CODEC);
-        LOGGER.atInfo().log("Plugin " + this.getName() + " loaded.");
+        
+        LOGGER.atInfo().log("Plugin " + this.getName() + " chargé en mémoire.");
     }
 
+    /**
+     * Récupère l'instance unique du plugin.
+     * Permet d'accéder au plugin depuis n'importe quelle autre classe.
+     * @return L'instance de HelloWorld.
+     */
+    public static HelloWorld getInstance() {
+        return instance;
+    }
+
+    /**
+     * Méthode start() : Appelée quand le serveur a fini de charger et est PRÊT.
+     * C'est ici qu'on lance tout.
+     */
     @Override
     public void start() {
         try {
-            // On essaie de récupérer la configuration. C'est ici que l'erreur peut se produire.
+            // 1. Chargement effectif de la configuration
+            // config.get() lit le fichier JSON sur le disque et le transforme en objet Java 'MyConfig'.
             MyConfig loadedConfig = config.get();
 
-            // Initialisation des services avec la configuration chargée
+            // 2. Initialisation des services (Injection de dépendances)
+            // On donne aux services juste ce dont ils ont besoin (la config).
             this.announcementService = new GlobalAnnouncementService(loadedConfig.announcements);
             WelcomeService welcomeService = new WelcomeService(loadedConfig);
 
-            // Enregistrement des événements
+            // 3. Enregistrement des Écouteurs (Listeners)
+            // On connecte l'événement "PlayerConnectEvent" à notre méthode "onPlayerJoin".
             getEventRegistry().register(PlayerConnectEvent.class, new PlayerListener(welcomeService)::onPlayerJoin);
             
-            // Démarrage des tâches de fond
+            // 4. Démarrage des tâches automatiques (Timer)
             announcementService.start();
             
-            LOGGER.atInfo().log("Plugin enabled successfully!");
+            LOGGER.atInfo().log("Plugin démarré avec succès !");
 
         } catch (IllegalStateException e) {
+            // Gestion d'erreur : Si le fichier JSON est mal formé, on attrape l'erreur ici pour ne pas faire crasher tout le serveur.
             LOGGER.atWarning().withCause(e).log(
-                "Failed to load 'welcome.json'. Please check for syntax errors or missing values. The plugin will not start."
+                "ERREUR CRITIQUE : Impossible de charger 'welcome.json'. Vérifiez la syntaxe du fichier. Le plugin est désactivé."
             );
-            // En cas d'erreur, on ne fait rien d'autre, donc le plugin est effectivement désactivé.
         }
     }
 
+    /**
+     * Méthode shutdown() : Appelée quand le serveur s'éteint.
+     * Important pour nettoyer la mémoire et arrêter les threads.
+     */
     @Override
     public void shutdown() {
-        // Arrêt propre des services
+        // On vérifie si le service existe (au cas où le start() aurait échoué)
         if (announcementService != null) {
             announcementService.stop();
         }
-        LOGGER.atInfo().log("Plugin disabled!");
+        LOGGER.atInfo().log("Plugin éteint.");
     }
+
+    /**
+     * Logger
+     */
+
+    public HytaleLogger setLog(String )
 }

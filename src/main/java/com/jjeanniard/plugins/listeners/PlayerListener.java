@@ -7,6 +7,10 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.util.EventTitleUtil;
 import com.jjeanniard.plugins.services.WelcomeService;
 
+/**
+ * Cette classe "écoute" ce qui se passe sur le serveur.
+ * Ici, elle s'intéresse spécifiquement aux connexions de joueurs.
+ */
 public final class PlayerListener {
     private final WelcomeService welcomeService;
     private static final HytaleLogger LOGGER = HytaleLogger.forEnclosingClass();
@@ -15,30 +19,35 @@ public final class PlayerListener {
         this.welcomeService = welcomeService;
     }
 
+    /**
+     * Cette méthode est appelée automatiquement par Hytale à chaque fois qu'un joueur se connecte.
+     * @param event L'objet événement contenant toutes les infos (qui est le joueur, quand, etc.)
+     */
     public void onPlayerJoin(PlayerConnectEvent event) {
+        // On récupère la référence du joueur qui vient d'arriver
         PlayerRef player = event.getPlayerRef();
         
-        // 1. Déterminer si c'est la première connexion
+        // TODO: Vérifier si c'est vraiment sa première fois (API à venir)
         boolean isFirstJoin = false; 
 
-        // 2. Récupérer le message brut depuis la config via le service
+        // 1. On demande au service quel est le texte brut (ex: "Bienvenue {player}")
         String rawMessage = welcomeService.getWelcomeMessage(isFirstJoin);
 
-        // 3. Remplacer les variables dynamiquement
+        // 2. On remplace "{player}" par le vrai nom "Steve"
         String formattedMessage = rawMessage.replace("{player}", player.getUsername());
 
-        // 4. Envoyer le titre au joueur
+        // 3. On affiche un grand titre à l'écran du joueur
         EventTitleUtil.showEventTitleToPlayer(
             player,
-            Message.raw(formattedMessage), // Titre principal (ex: "Bienvenue Steve")
-            Message.raw("Amuse-toi bien !"), // Sous-titre (vous pouvez aussi le mettre dans la config si vous voulez)
-            true,                          // isMajor (Gros titre)
-            "ui/icons/announcement.png",   // Icône
-            5.0f,                          // Durée (secondes)
-            1.5f,                          // Fade in
-            1.5f                           // Fade out
+            Message.raw(formattedMessage), // Titre principal
+            Message.raw("Amuse-toi bien !"), // Sous-titre
+            true,                          // isMajor (Vrai = Gros titre, Faux = Petit titre au dessus de la barre d'action)
+            "ui/icons/announcement.png",   // Chemin vers l'icône (dans les assets du jeu)
+            5.0f,                          // Durée d'affichage (secondes)
+            1.5f,                          // Temps d'apparition (Fade in)
+            1.5f                           // Temps de disparition (Fade out)
         );
 
-        LOGGER.atInfo().log("Player joined: " + player.getUsername() + " (Title sent: " + formattedMessage + ")");
+        LOGGER.atInfo().log("Joueur connecté : " + player.getUsername());
     }
 }
