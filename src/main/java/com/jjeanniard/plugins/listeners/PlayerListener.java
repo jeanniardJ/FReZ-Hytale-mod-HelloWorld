@@ -3,6 +3,7 @@ package com.jjeanniard.plugins.listeners;
 import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.util.EventTitleUtil;
 import com.jjeanniard.plugins.Log;
 import com.jjeanniard.plugins.services.WelcomeService;
@@ -49,5 +50,10 @@ public final class PlayerListener {
         );
 
         Log.info("Joueur connecté : %s", player.getUsername());
+
+        World world = event.getWorld();
+
+        assert world != null;
+        world.trackPlayerRef(player);
     }
 }

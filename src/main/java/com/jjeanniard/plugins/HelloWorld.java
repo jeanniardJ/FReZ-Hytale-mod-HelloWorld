@@ -6,6 +6,7 @@ import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 import com.hypixel.hytale.server.core.util.Config;
 import com.jjeanniard.plugins.config.MyConfig;
 import com.jjeanniard.plugins.listeners.PlayerListener;
+import com.jjeanniard.plugins.services.AnnouncementUniverseService;
 import com.jjeanniard.plugins.services.GlobalAnnouncementService;
 import com.jjeanniard.plugins.services.WelcomeService;
 
@@ -29,6 +30,7 @@ public final class HelloWorld extends JavaPlugin {
 
     // Nos services (logique métier).
     private GlobalAnnouncementService announcementService;
+    private AnnouncementUniverseService announcementUniverseService;
 
     /**
      * Constructeur : Appelé quand Hytale DÉCOUVRE le plugin (avant le démarrage du serveur).
@@ -90,6 +92,7 @@ public final class HelloWorld extends JavaPlugin {
             // 2. Initialisation des services (Injection de dépendances)
             // On donne aux services juste ce dont ils ont besoin (la config).
             this.announcementService = new GlobalAnnouncementService(cfg.globalAnnouncementsConfig);
+            this.announcementUniverseService = new AnnouncementUniverseService(cfg.globalAnnouncementsConfig, cfg.announceUniverseConfig);
             WelcomeService welcomeService = new WelcomeService(cfg.welcomeConfig);
 
             // 3. Enregistrement des commandes
@@ -101,6 +104,8 @@ public final class HelloWorld extends JavaPlugin {
 
             // 5. Démarrage des tâches automatiques (Timer)
             announcementService.start();
+
+            announcementUniverseService.start();
 
             Log.info("Plugin démarré avec succès !");
 

@@ -15,7 +15,7 @@ import javax.annotation.Nonnull;
 public class GlobalAnnouncementsConfig {
     private int interval = 300; // Intervalle global pour toutes les annonces (en secondes)
     @Nonnull
-    private String[] announcementArray; // Une seule liste d'annonces
+    private String[] announcementArray = {"Astuce : Vérifiez votre inventaire avant l'exploration !", "Événement : Aucun événement n'est prévu.", "Maintenance quotidienne à 03h00"}; // Une seule liste d'annonces
 
     public static final Codec<GlobalAnnouncementsConfig> CODEC = BuilderCodec.builder(GlobalAnnouncementsConfig.class, GlobalAnnouncementsConfig::new)
             .append(new KeyedCodec<>("CooldownSeconds", Codec.INTEGER),
