@@ -20,7 +20,7 @@ repositories {
 dependencies {
     //compileOnly("com.hytale:server-api:1.0.0")
     // Hytale Server API (provided by server at runtime)
-    compileOnly(files("./libs/HytaleServer.jar"))
+    compileOnly(files("C:\\Users\\jonat\\AppData\\Roaming\\Hytale\\install\\release\\package\\game\\latest\\Server\\HytaleServer.jar"))
 
     // Common dependencies (will be bundled in JAR)
     implementation("com.google.guava:guava:32.1.3-jre")
@@ -35,8 +35,9 @@ dependencies {
 runHytale {
     // TODO: Update this URL when Hytale server is available
     // Using Paper server as placeholder for testing the runServer functionality
-    jarUrl = "./libs/HytaleServer.jar"
-    assetsPath = "./libs/Assets.zip"
+    jarUrl =
+        "C:\\Users\\jonat\\AppData\\Roaming\\Hytale\\install\\release\\package\\game\\latest\\Server\\HytaleServer.jar"
+    assetsPath = "C:\\Users\\jonat\\AppData\\Roaming\\Hytale\\install\\release\\package\\game\\latest\\Assets.zip"
 }
 
 tasks {

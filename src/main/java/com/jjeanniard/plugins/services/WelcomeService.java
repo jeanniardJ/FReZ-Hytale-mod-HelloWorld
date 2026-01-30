@@ -1,6 +1,6 @@
 package com.jjeanniard.plugins.services;
 
-import com.jjeanniard.plugins.config.MyConfig;
+import com.jjeanniard.plugins.config.WelcomeToServerConfig;
 
 /**
  * Service simple pour gérer la logique des messages de bienvenue.
@@ -11,13 +11,16 @@ public final class WelcomeService {
     private final String rejoinMessage;
 
     // Injection de dépendance : On lui donne la config, il en extrait ce qu'il veut.
-    public WelcomeService(MyConfig config) {
-        this.firstJoinMessage = config.welcome.firstJoin;
-        this.rejoinMessage = config.welcome.rejoin;
+    public WelcomeService(WelcomeToServerConfig config) {
+        this.firstJoinMessage = config.getFirstJoin();
+        this.rejoinMessage = config.getFirstJoin();
     }
 
     /**
      * Retourne le message approprié selon le contexte.
+     *
+     * @param isFirstJoin Indique si c'est la première connexion du joueur.
+     * @return Le message de bienvenue approprié.
      */
     public String getWelcomeMessage(boolean isFirstJoin) {
         // Opérateur ternaire : (condition) ? (si vrai) : (si faux)

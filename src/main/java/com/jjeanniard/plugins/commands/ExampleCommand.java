@@ -1,4 +1,4 @@
-package com.jjeanniard.plugins;
+package com.jjeanniard.plugins.commands;
 
 import com.hypixel.hytale.protocol.GameMode;
 import com.hypixel.hytale.server.core.Message;

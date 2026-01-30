@@ -13,70 +13,48 @@ import javax.annotation.Nonnull;
 public class MyConfig {
 
     // Ces variables contiendront les données du fichier.
-    public WelcomeConfig welcome = new WelcomeConfig();
-    public AnnouncementsConfig announcements = new AnnouncementsConfig();
+    public WelcomeToServerConfig welcomeConfig = new WelcomeToServerConfig();
+    public GlobalAnnouncementsConfig globalAnnouncementsConfig = new GlobalAnnouncementsConfig();
+    public PortalConfig portal = new PortalConfig();
 
     /**
-     * Le CODEC est le "traducteur".
-     * Il explique à Hytale comment lire le JSON ligne par ligne pour remplir notre classe.
-     * 
-     * Structure :
-     * - "Welcome" dans le JSON -> remplit l'objet 'welcome'
-     * - "Announcements" dans le JSON -> remplit l'objet 'announcements'
+     * Le CODEC principal est le "traducteur" pour toute la configuration.
+     * Il explique à Hytale comment lire le JSON pour remplir notre classe MyConfig.
      */
     public static final BuilderCodec<MyConfig> CODEC = BuilderCodec.builder(MyConfig.class, MyConfig::new)
-            .append(new KeyedCodec<>("Welcome", WelcomeConfig.CODEC),
-                    (config, value, info) -> config.welcome = value,
-                    (config, info) -> config.welcome)
+            .append(new KeyedCodec<>("Welcome", WelcomeToServerConfig.CODEC),
+                    (config, value, info) -> {
+                        config.welcomeConfig.setFirstJoin(value.getFirstJoin());
+                        config.welcomeConfig.setRejoin(value.getRejoin());
+                    },
+                    (config, info) -> config.welcomeConfig)
             .add()
-            .append(new KeyedCodec<>("Announcements", AnnouncementsConfig.CODEC),
-                    (config, value, info) -> config.announcements = value,
-                    (config, info) -> config.announcements)
+            .append(new KeyedCodec<>("GlobalsAnnouncements", GlobalAnnouncementsConfig.CODEC),
+                    (config, value, info) -> config.globalAnnouncementsConfig = value,
+                    (config, info) -> config.globalAnnouncementsConfig)
+            .add()
+            .append(new KeyedCodec<>("Portal", PortalConfig.CODEC),
+                    (config, value, info) -> config.portal = value,
+                    (config, info) -> config.portal)
             .add()
             .build();
 
     /**
-     * Sous-section pour les messages de bienvenue.
+     * Configuration pour les portails.
      */
-    public static class WelcomeConfig {
+    public static class PortalConfig {
         @Nonnull
-        public String firstJoin = "Welcome {player} to the server!";
+        public String title = "Voyage vers {world}";
         @Nonnull
-        public String rejoin = "Welcome back, {player}!";
+        public String subtitle = "Préparez-vous !";
 
-        // Codec spécifique pour cette sous-section
-        public static final Codec<WelcomeConfig> CODEC = BuilderCodec.builder(WelcomeConfig.class, WelcomeConfig::new)
-                .append(new KeyedCodec<>("FirstJoin", Codec.STRING), (c, v, i) -> c.firstJoin = v, (c, i) -> c.firstJoin)
+        public static final Codec<PortalConfig> CODEC = BuilderCodec.builder(PortalConfig.class, PortalConfig::new)
+                .append(new KeyedCodec<>("Title", Codec.STRING), (c, v, i) -> c.title = v, (c, i) -> c.title)
                 .add()
-                .append(new KeyedCodec<>("Rejoin", Codec.STRING), (c, v, i) -> c.rejoin = v, (c, i) -> c.rejoin)
+                .append(new KeyedCodec<>("Subtitle", Codec.STRING), (c, v, i) -> c.subtitle = v, (c, i) -> c.subtitle)
                 .add()
                 .build();
-
     }
 
-    /**
-     * Sous-section pour les annonces automatiques.
-     */
-    public static class AnnouncementsConfig {
-        private int cooldownSeconds = 300; // Par défaut 5 minutes
-        private String[] messages = { "Message par défaut 1", "Message par défaut 2" };
 
-        public static final Codec<AnnouncementsConfig> CODEC = BuilderCodec.builder(AnnouncementsConfig.class, AnnouncementsConfig::new)
-                .append(new KeyedCodec<>("CooldownSeconds", Codec.INTEGER), (c, v, i) -> c.cooldownSeconds = v, (c, i) -> c.cooldownSeconds)
-                .add()
-                // Codec.STRING_ARRAY gère automatiquement les listes JSON ["a", "b"]
-                .append(new KeyedCodec<>("Messages", Codec.STRING_ARRAY), (c, v, i) -> c.messages = v, (c, i) -> c.messages)
-                .add()
-                .build();
-
-
-        public int getCooldownSeconds() {
-            return cooldownSeconds;
-        }
-
-        @Nonnull
-        public String[] getMessages() {
-            return messages;
-        }
-    }
 }

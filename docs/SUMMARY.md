@@ -1,0 +1,1 @@
+Ce fichier est obsolète. Veuillez utiliser README.md comme point d'entrée de la documentation.

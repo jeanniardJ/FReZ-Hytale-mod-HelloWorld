@@ -3,9 +3,9 @@
     "FirstJoin": "Bienvenue {player} sur le serveur !",
     "Rejoin": "Re-bonjour {player}, content de te revoir !"
   },
-  "Announcements": {
+  "GlobalsAnnouncements": {
     "CooldownSeconds": 300,
-    "Messages": [
+    "Announcements": [
       "Astuce : Vérifiez votre inventaire avant l'exploration !",
       "Événement : Aucun événement n'est prévu.",
       "Maintenance quotidienne à 03h00",
@@ -15,6 +15,5 @@
       "Joueurs en ligne : {online}/{playersMax}",
       "Bonne nuit ! Serveur en pause nocturne :)"
     ]
-
   }
 }
