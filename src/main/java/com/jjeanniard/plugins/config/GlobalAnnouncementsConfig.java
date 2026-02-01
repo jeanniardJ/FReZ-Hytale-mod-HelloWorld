@@ -39,7 +39,7 @@ public class GlobalAnnouncementsConfig {
         this.interval = interval;
     }
 
-    public String[] getStringArray() {
+    public String[] getAnnouncementArray() {
         return announcementArray;
     }
 

@@ -12,7 +12,7 @@ public class MyConfig {
     // Ces variables contiendront les données du fichier.
     public WelcomeToServerConfig welcomeConfig = new WelcomeToServerConfig();
     public GlobalAnnouncementsConfig globalAnnouncementsConfig = new GlobalAnnouncementsConfig();
-    public AnnounceUniverseConfig announceUniverseConfig = new AnnounceUniverseConfig();
+    public UniverseAnnouncementsConfig announceUniverseConfig = new UniverseAnnouncementsConfig();
 
     /**
      * Le CODEC principal est le "traducteur" pour toute la configuration.
@@ -27,7 +27,7 @@ public class MyConfig {
                     (config, value, info) -> config.globalAnnouncementsConfig = value,
                     (config, info) -> config.globalAnnouncementsConfig)
             .add()
-            .append(new KeyedCodec<>("AnnouncementUniverse", AnnounceUniverseConfig.CODEC),
+            .append(new KeyedCodec<>("AnnouncementUniverse", UniverseAnnouncementsConfig.CODEC),
                     (config, value, info) -> config.announceUniverseConfig = value,
                     (config, info) -> config.announceUniverseConfig)
             .add()

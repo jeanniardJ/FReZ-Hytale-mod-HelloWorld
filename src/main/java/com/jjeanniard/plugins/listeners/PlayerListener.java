@@ -1,9 +1,10 @@
 package com.jjeanniard.plugins.listeners;
 
 import com.hypixel.hytale.server.core.Message;
+import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
-import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.util.EventTitleUtil;
 import com.jjeanniard.plugins.Log;
 import com.jjeanniard.plugins.services.WelcomeService;
@@ -31,7 +32,7 @@ public final class PlayerListener {
         // TODO: Vérifier si c'est vraiment sa première fois (API à venir)
         boolean isFirstJoin = false;
 
-        // 1. On demande au service quel est le texte brut (ex: "Bienvenue {player}")
+        // 1. On demande au service quel est le texte brut (ex : "Bienvenue {player}")
         String rawMessage = welcomeService.getWelcomeMessage(isFirstJoin);
 
         // 2. On remplace "{player}" par le vrai nom "Steve"
@@ -50,10 +51,11 @@ public final class PlayerListener {
         );
 
         Log.info("Joueur connecté : %s", player.getUsername());
+    }
 
-        World world = event.getWorld();
-
-        assert world != null;
-        world.trackPlayerRef(player);
+    public void onPlayerJoinUnivers(AddPlayerToWorldEvent event) {
+        Player player = event.getHolder().getComponent(Player.getComponentType());
+        String worldName = event.getWorld().getName();
+        Log.debug("OnPlayerJoinUniver : " + event);
     }
 }

@@ -63,4 +63,5 @@ public final class Log {
     public static void debug(String message, Object... args) {
         LOGGER.atFine().log(message, args);
     }
+
 }

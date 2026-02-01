@@ -10,7 +10,7 @@ import javax.annotation.Nonnull;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AnnounceUniverseConfig {
+public class UniverseAnnouncementsConfig {
     @Nonnull
     private String title = "Voyage vers {world}";
     @Nonnull
@@ -39,7 +39,7 @@ public class AnnounceUniverseConfig {
             true               // Modifiable ? Oui (false = pas unmodifiable)
     );
 
-    public static final Codec<AnnounceUniverseConfig> CODEC = BuilderCodec.builder(AnnounceUniverseConfig.class, AnnounceUniverseConfig::new)
+    public static final Codec<UniverseAnnouncementsConfig> CODEC = BuilderCodec.builder(UniverseAnnouncementsConfig.class, UniverseAnnouncementsConfig::new)
             .append(new KeyedCodec<>("Title", Codec.STRING), (c, v, i) -> c.title = v, (c, i) -> c.title)
             .add()
             .append(new KeyedCodec<>("Subtitle", Codec.STRING), (c, v, i) -> c.subtitle = v, (c, i) -> c.subtitle)
