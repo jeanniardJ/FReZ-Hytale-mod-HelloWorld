@@ -1,56 +1,54 @@
-# ⚙️ World Configuration (WorldConfig)
+# WorldConfig API
 
-Chaque monde sur un serveur Hytale possède son propre fichier de configuration, géré par la classe `WorldConfig`.
+La classe `WorldConfig` contient tous les paramètres de configuration d'un monde spécifique.
 
-## 1. Emplacement du Fichier
-La configuration d'un monde se trouve dans le dossier de ce monde, sous le nom `config.json`.
-```
-<dossier_serveur>/
-└── universe/
-    └── worlds/
-        └── <nom_du_monde>/
-            └── config.json
-```
-
-## 2. Accès à la Configuration d'un Monde
-Vous pouvez accéder à l'objet `WorldConfig` d'un monde chargé via l'instance `World`.
+## Accès
 
 ```java
-import com.hypixel.hytale.server.core.universe.world.World;
-import com.hypixel.hytale.server.core.universe.world.WorldConfig;
-
-// Récupérer le monde
-World myWorld = Universe.get().getWorld("NomDuMonde");
-
-if (myWorld != null) {
-    // Récupérer sa configuration
-    WorldConfig worldConfig = myWorld.getWorldConfig();
-    
-    // Utiliser la configuration
-    long seed = worldConfig.getSeed();
-    boolean isPvpEnabled = worldConfig.isPvpEnabled();
-}
+WorldConfig config = world.getWorldConfig();
 ```
 
-## 3. Paramètres Principaux
-La classe `WorldConfig` contient de nombreux paramètres pour personnaliser le comportement d'un monde :
+## Propriétés Principales
 
-*   **Identification** : `uuid`, `displayName`, `seed`.
-*   **Génération** : `spawnProvider`, `worldGenProvider`, `worldMapProvider`, `chunkStorageProvider`.
-*   **Règles du jeu** : `isTicking`, `isBlockTicking`, `isPvpEnabled`, `isFallDamageEnabled`, `gameMode`.
-*   **Temps et Météo** : `gameTime`, `isGameTimePaused`, `forcedWeather`, `daytimeDurationSecondsOverride`, `nighttimeDurationSecondsOverride`.
-*   **Entités** : `isSpawningNPC`, `isAllNPCFrozen`.
-*   **Sauvegarde** : `isSavingPlayers`, `canSaveChunks`, `saveNewChunks`, `canUnloadChunks`.
-*   **Cycle de vie** : `deleteOnUniverseStart`, `deleteOnRemove`.
-*   **Plugins** : `requiredPlugins`, `pluginConfig`.
+### 1. Mode de Jeu (`GameMode`)
 
-## 4. Configuration des Chunks (`ChunkConfig`)
-La classe interne `ChunkConfig` permet de configurer des régions spécifiques :
-*   **`pregenerateRegion`** : Une `Box2D` qui définit une zone à pré-générer au démarrage du monde.
-*   **`keepLoadedRegion`** : Une `Box2D` qui définit une zone de chunks qui ne sera jamais déchargée.
+Définit le mode de jeu par défaut pour les joueurs rejoignant ce monde.
 
-## 5. Configuration des Plugins par Monde (`pluginConfig`)
-Le système `pluginConfig` permet à un plugin de stocker sa propre configuration spécifique à un monde directement dans le `config.json` du monde. C'est une fonctionnalité très puissante pour les plugins qui ont besoin de paramètres différents pour chaque monde.
+```java
+import com.hypixel.hytale.protocol.GameMode;
 
-## 6. Le `WorldConfigProvider`
-L'interface `WorldConfigProvider` est le mécanisme interne utilisé par Hytale pour lire (`load`) et écrire (`save`) ces fichiers de configuration. Les développeurs de plugins n'ont généralement pas besoin d'interagir directement avec cette interface.
+GameMode mode = config.getGameMode(); // SURVIVAL, CREATIVE, ADVENTURE
+// config.setGameMode(GameMode.CREATIVE);
+```
+
+### 2. Règles du Jeu (`GameRules`)
+
+Active ou désactive certaines mécaniques.
+
+```java
+// Exemple hypothétique (l'API exacte peut varier)
+boolean pvp = config.isPvpEnabled();
+boolean mobSpawning = config.isMobSpawningEnabled();
+```
+
+### 3. Génération (`ChunkGenerator`)
+
+Définit comment le terrain est généré.
+
+```java
+// Récupérer le générateur
+ChunkGenerator generator = config.getChunkGenerator();
+```
+
+### 4. Point d'Apparition (`SpawnPoint`)
+
+```java
+import com.hypixel.hytale.math.vector.Vector3d;
+
+Vector3d spawn = config.getSpawnPoint();
+```
+
+## Modification
+
+Certaines propriétés peuvent être modifiées à la volée, d'autres nécessitent un redémarrage du monde ou ne sont définies
+qu'à la création.

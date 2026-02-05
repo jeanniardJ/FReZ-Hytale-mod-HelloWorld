@@ -1,0 +1,114 @@
+@TitleStyle = LabelStyle(
+  FontSize: 16,
+  TextColor: #bfcdd5,
+  HorizontalAlignment: Center,
+  RenderBold: true,
+  RenderUppercase: true
+);
+
+@LabelStyle = LabelStyle(
+  FontSize: 12,
+  TextColor: #6b7a8c
+);
+
+@InputStyle = InputFieldStyle(
+  Default: (Background: #1a1a1a, LabelStyle: (FontSize: 14, TextColor: #ffffff, VerticalAlignment: Center)),
+  Hovered: (Background: #2a2a2a, LabelStyle: (FontSize: 14, TextColor: #ffffff, VerticalAlignment: Center)),
+  Focused: (Background: #000000, LabelStyle: (FontSize: 14, TextColor: #ffffff, VerticalAlignment: Center)),
+  Placeholder: (FontSize: 14, TextColor: #666666, VerticalAlignment: Center)
+);
+
+@BtnStyle = TextButtonStyle(
+  Default: (Background: #333333, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #444444, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #222222, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
+Group {
+  LayoutMode: Center;
+
+  Group #panel {
+    Anchor: (Width: 400, Height: 300);
+    Background: #1e2a3a;
+
+    Group #Title {
+      Anchor: (Height: 38, Top: 0);
+      Padding: (Top: 8);
+      LayoutMode: Center;
+
+      Label #title {
+        Text: "ÉDITER L'ANNONCE";
+        Style: @TitleStyle;
+      }
+    }
+
+    Group #Stroke {
+      Anchor: (Height: 2, Top: 38);
+      Background: #3a4a5a;
+    }
+
+    Group #Content {
+      LayoutMode: Top;
+      Anchor: (Top: 40, Bottom: 0);
+      Padding: (Left: 24, Right: 24, Top: 16, Bottom: 24);
+      Background: #232d3f;
+
+      Label {
+        Text: "Message";
+        Style: @LabelStyle;
+        Anchor: (Bottom: 5);
+      }
+
+      Group {
+        Anchor: (Height: 40);
+        Background: #1a1a1a;
+        Padding: (Left: 12, Right: 12, Top: 8, Bottom: 8);
+
+        TextField #messageInput {
+          Anchor: (Height: 24);
+          Style: @InputStyle;
+        }
+      }
+
+      Label {
+        Text: "Monde Cible (Laisser vide pour Global)";
+        Style: @LabelStyle;
+        Anchor: (Top: 15, Bottom: 5);
+      }
+
+      Group {
+        Anchor: (Height: 40);
+        Background: #1a1a1a;
+        Padding: (Left: 12, Right: 12, Top: 8, Bottom: 8);
+
+        TextField #worldInput {
+          Anchor: (Height: 24);
+          Style: @InputStyle;
+        }
+      }
+
+      Group {
+        Anchor: (Top: 30);
+        LayoutMode: Left;
+
+        Label { FlexWeight: 1; }
+
+        TextButton #cancelButton {
+          Text: "ANNULER";
+          Anchor: (Width: 120, Height: 40, Right: 12);
+          Padding: (Horizontal: 20);
+          Style: @BtnStyle;
+        }
+
+        TextButton #saveButton {
+          Text: "SAUVEGARDER";
+          Anchor: (Width: 120, Height: 40);
+          Padding: (Horizontal: 20);
+          Style: @BtnStyle;
+        }
+
+        Label { FlexWeight: 1; }
+      }
+    }
+  }
+}

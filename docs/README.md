@@ -17,12 +17,14 @@ N'hésitez pas à l'explorer et à la compléter !
 * **Général**
     * [HytaleServer](api_reference/general/hytaleserver.md)
     * [Logging](api_reference/general/logging.md)
+    * [Permissions](api_reference/general/permissions.md)
     * [Universe](api_reference/general/universe.md)
 * **Entités**
     * [Joueur (PlayerRef)](api_reference/entity/player.md)
 * **Événements**
     * [Listeners](api_reference/event/listeners.md)
 * **Interface Utilisateur (UI)**
+    * [Custom UI (GUI)](api_reference/ui/custom_ui.md)
     * [Messages Formatés](api_reference/ui/message.md)
     * [Titres à l'écran](api_reference/ui/titles.md)
 * **Monde**

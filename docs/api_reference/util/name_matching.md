@@ -1,33 +1,24 @@
-# 🔍 NameMatching Utility
+# NameMatching API
 
-La classe `NameMatching` est un `enum` qui fournit des stratégies pour rechercher des entités (comme les joueurs) par leur nom, avec différentes options de correspondance.
+Utilitaire pour la recherche de joueurs ou d'entités par nom, avec différentes stratégies de correspondance.
 
-## 1. Stratégies de Correspondance
+## Stratégies (`NameMatching`)
 
-| Stratégie | Description | Sensible à la casse ? |
-| :--- | :--- | :--- |
-| `EXACT` | Le nom doit correspondre exactement. | Oui |
-| `EXACT_IGNORE_CASE` | Le nom doit correspondre exactement. | Non |
-| `STARTS_WITH` | Le nom doit commencer par la chaîne de recherche. | Oui |
-| `STARTS_WITH_IGNORE_CASE` | Le nom doit commencer par la chaîne de recherche. | Non |
+* **`EXACT`** : Le nom doit correspondre exactement (sensible à la casse).
+    * "Steve" == "Steve"
+    * "steve" != "Steve"
+* **`CASE_INSENSITIVE`** : Le nom doit correspondre, peu importe la casse.
+    * "steve" == "Steve"
+* **`START_WITH`** : Le nom doit commencer par la chaîne donnée.
+    * "Ste" correspond à "Steve"
+* **`DEFAULT`** : Généralement `CASE_INSENSITIVE` ou une combinaison intelligente.
 
-`NameMatching.DEFAULT` est défini sur `STARTS_WITH_IGNORE_CASE`.
-
-## 2. Utilisation
-Ces stratégies sont utilisées avec les méthodes de recherche de joueurs dans la classe `Universe`.
+## Utilisation
 
 ```java
-import com.hypixel.hytale.server.core.Universe;
 import com.hypixel.hytale.server.core.NameMatching;
-import com.hypixel.hytale.server.core.universe.PlayerRef;
+import com.hypixel.hytale.server.core.universe.Universe;
 
-// Recherche par défaut (commence par, insensible à la casse)
-PlayerRef player1 = Universe.get().getPlayerByUsername("ste", NameMatching.DEFAULT); 
-// Si "Steve" est connecté, player1 sera "Steve".
-
-// Recherche exacte, sensible à la casse
-PlayerRef player2 = Universe.get().getPlayerByUsername("Steve", NameMatching.EXACT);
-
-// Recherche "commence par", sensible à la casse
-PlayerRef player3 = Universe.get().getPlayerByUsername("ste", NameMatching.STARTS_WITH);
+// Recherche d'un joueur
+PlayerRef player = Universe.get().getPlayerByUsername("steve", NameMatching.CASE_INSENSITIVE);
 ```

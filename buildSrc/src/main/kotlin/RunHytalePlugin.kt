@@ -31,8 +31,14 @@ open class RunHytalePlugin : Plugin<Project> {
             description = "Downloads and runs the Hytale server with your plugin"
         }
 
+        val deployTask = project.tasks.register("deployPlugin", DeployPluginTask::class.java) {
+            group = "hytale"
+            description = "Builds and copies the plugin JAR to the run/mods directory without starting the server"
+        }
+
         project.tasks.findByName("shadowJar")?.let {
             runTask.configure { dependsOn(it) }
+            deployTask.configure { dependsOn(it) }
         }
     }
 }
@@ -43,6 +49,26 @@ open class RunHytalePlugin : Plugin<Project> {
 open class RunHytaleExtension {
     var jarUrl: String = "https://example.com/hytale-server.jar"
     var assetsPath: String? = null
+}
+
+/**
+ * Task that builds and deploys the plugin JAR to the mods folder.
+ */
+open class DeployPluginTask : DefaultTask() {
+    @TaskAction
+    fun deploy() {
+        val runDir = File(project.projectDir, "run")
+        val pluginsDir = File(runDir, "mods").apply { mkdirs() }
+
+        project.tasks.findByName("shadowJar")?.outputs?.files?.firstOrNull()?.let { shadowJar ->
+            val targetFile = File(pluginsDir, shadowJar.name)
+            shadowJar.copyTo(targetFile, overwrite = true)
+            println("Plugin deployed to: ${targetFile.absolutePath}")
+            println("You can now run '/plugin reload ${project.name}' or '/plugin restart ${project.name}' in the server console.")
+        } ?: run {
+            println("WARNING: Could not find shadowJar output")
+        }
+    }
 }
 
 /**

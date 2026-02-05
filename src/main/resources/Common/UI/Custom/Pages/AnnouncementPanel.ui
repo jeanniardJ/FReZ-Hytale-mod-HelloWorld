@@ -1,0 +1,110 @@
+@TitleStyle = LabelStyle(
+  FontSize: 16,
+  TextColor: #bfcdd5,
+  HorizontalAlignment: Center,
+  RenderBold: true,
+  RenderUppercase: true
+);
+
+@HeaderStyle = LabelStyle(
+  FontSize: 14,
+  TextColor: #bfcdd5,
+  RenderBold: true
+);
+
+@HeaderCenterStyle = LabelStyle(
+  FontSize: 14,
+  TextColor: #bfcdd5,
+  RenderBold: true,
+  HorizontalAlignment: Center
+);
+
+@AddButtonStyle = TextButtonStyle(
+  Default: (Background: #2563eb, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #3b82f6, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #1d4ed8, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
+Group {
+  LayoutMode: Center;
+
+  Group #panel {
+    Anchor: (Width: 800, Height: 600);
+    Background: #1e2a3a;
+
+    Group #Title {
+      Anchor: (Height: 38, Top: 0);
+      Padding: (Top: 8, Left: 10, Right: 10);
+      LayoutMode: Left;
+
+      Label #title {
+        Text: "GESTION DES ANNONCES";
+        FlexWeight: 1;
+        Style: @TitleStyle;
+      }
+
+      TextButton #refreshButton {
+        Text: "R";
+        Anchor: (Width: 30, Height: 30);
+      }
+
+      TextButton #closeButton {
+        Text: "X";
+        Anchor: (Width: 30, Height: 30, Left: 5);
+      }
+    }
+
+    Group #Stroke {
+      Anchor: (Height: 2, Top: 38);
+      Background: #3a4a5a;
+    }
+
+    Group #Content {
+      LayoutMode: Top;
+      Anchor: (Top: 40, Bottom: 0);
+      Padding: (Left: 24, Right: 24, Top: 16, Bottom: 24);
+      Background: #232d3f;
+
+      Group {
+        LayoutMode: Left;
+        Anchor: (Height: 30);
+
+        Label {
+          Text: "Message";
+          FlexWeight: 3;
+          Style: @HeaderStyle;
+        }
+
+        Label {
+          Text: "Monde";
+          FlexWeight: 1;
+          Style: @HeaderStyle;
+        }
+
+        Label {
+          Text: "Actions";
+          FlexWeight: 1;
+          Style: @HeaderCenterStyle;
+        }
+      }
+
+      Group #AnnouncementList {
+        LayoutMode: TopScrolling;
+        FlexWeight: 1;
+        Padding: (Right: 10);
+      }
+
+      Group {
+        Anchor: (Height: 50, Top: 10);
+        LayoutMode: Center;
+
+        TextButton #addButton {
+          Text: "AJOUTER UNE ANNONCE";
+          Anchor: (Width: 200, Height: 40);
+          Padding: (Horizontal: 20);
+          Style: @AddButtonStyle;
+        }
+      }
+    }
+  }
+}

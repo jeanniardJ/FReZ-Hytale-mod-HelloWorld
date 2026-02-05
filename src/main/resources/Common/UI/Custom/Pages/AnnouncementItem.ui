@@ -1,0 +1,61 @@
+@MessageStyle = LabelStyle(
+  FontSize: 14,
+  TextColor: #e5e7eb,
+  VerticalAlignment: Center
+);
+
+@WorldStyle = LabelStyle(
+  FontSize: 14,
+  TextColor: #9ca3af,
+  VerticalAlignment: Center
+);
+
+@EditBtnStyle = TextButtonStyle(
+  Default: (Background: #22c55e, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #4ade80, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #16a34a, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
+@DeleteBtnStyle = TextButtonStyle(
+  Default: (Background: #ef4444, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Hovered: (Background: #f87171, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+  Pressed: (Background: #dc2626, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center))
+);
+
+Group {
+  LayoutMode: Left;
+  Anchor: (Height: 50);
+  Padding: (Bottom: 10);
+
+  Label #messageText {
+    FlexWeight: 3;
+    Style: @MessageStyle;
+    Padding: (Right: 10);
+    Text: "Message par défaut";
+  }
+
+  Label #worldText {
+    FlexWeight: 1;
+    Style: @WorldStyle;
+    Padding: (Right: 10);
+    Text: "Global";
+  }
+
+  Group {
+    FlexWeight: 1;
+    LayoutMode: Left;
+
+    TextButton #editButton {
+      Text: "Edit";
+      Anchor: (Width: 60, Height: 30);
+      Padding: (Right: 10);
+      Style: @EditBtnStyle;
+    }
+
+    TextButton #deleteButton {
+      Text: "Del";
+      Anchor: (Width: 60, Height: 30);
+      Style: @DeleteBtnStyle;
+    }
+  }
+}

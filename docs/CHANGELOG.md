@@ -4,6 +4,23 @@ Ce fichier retrace l'historique des découvertes et des mises à jour de la docu
 
 ---
 
+### **Session UI & Gestion des Annonces (Date actuelle)**
+
+#### ✨ Nouvelles Documentations
+*   **Interface Utilisateur (UI)**
+    *   `api_reference/ui/ui_system.md` : Documentation complète du système d'UI déclaratif de Hytale.
+        *   Structure des fichiers `.ui` et `manifest.json`.
+        *   Utilisation de `InteractiveCustomUIPage` pour les formulaires.
+        *   Gestion des événements UI avec `EventData` et `CODEC`.
+        *   Styles et variables `Common.ui`.
+
+#### 🔄 Améliorations
+*   **Commandes** : Mise à jour implicite de la gestion des commandes pour inclure le contexte joueur/console (`CommandContext.isPlayer()`, `senderAs(Player.class)`).
+*   **Threading** : Découverte de l'importance de `world.execute(() -> {})` pour accéder aux composants ECS (`Store`) depuis une commande asynchrone.
+*   **Logging** : Adaptation de la classe `Log` pour être compatible avec les tests unitaires (fallback sur `System.out`).
+
+---
+
 ### **Session Initiale (Date de création du projet)**
 
 #### ✨ Nouvelles Documentations

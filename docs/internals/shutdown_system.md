@@ -1,32 +1,28 @@
-# 🔌 Système d'Arrêt (Shutdown)
+# Système d'Arrêt (Shutdown System)
 
-Ce document explique comment le serveur Hytale gère son processus d'arrêt, basé sur l'analyse de `ShutdownReason.java` et `HytaleServer.java`.
+Procédure d'arrêt propre du serveur.
 
-## 1. Le Processus d'Arrêt
-L'arrêt du serveur est initié via la méthode `HytaleServer.get().shutdownServer(ShutdownReason reason)`.
-Ce processus déclenche l'événement `ShutdownEvent`, qui est utilisé par les différents modules du serveur (y compris les plugins) pour se nettoyer proprement.
+## Déclenchement
 
-## 2. Les Raisons d'Arrêt (`ShutdownReason`)
-Chaque arrêt est associé à une raison spécifique, qui inclut un code de sortie standard pour les scripts externes.
+L'arrêt peut être déclenché par :
 
-| Raison | Code de Sortie | Description |
-| :--- | :--- | :--- |
-| `SHUTDOWN` | 0 | Arrêt normal et propre (ex: commande `/stop`). |
-| `CRASH` | 1 | Le serveur a rencontré une erreur fatale inattendue. |
-| `SIGINT` | 130 | L'utilisateur a appuyé sur `Ctrl+C` dans la console. |
-| `AUTH_FAILED` | 2 | Une erreur d'authentification a empêché le démarrage. |
-| `WORLD_GEN` | 3 | Une erreur est survenue lors de la génération d'un monde. |
-| `CLIENT_GONE` | 4 | Le client s'est déconnecté (utilisé en mode solo). |
-| `MISSING_REQUIRED_PLUGIN` | 5 | Un plugin listé comme dépendance est introuvable. |
-| `VALIDATE_ERROR` | 6 | Une erreur de validation des assets ou d'autres fichiers a eu lieu. |
+* La commande `/stop`.
+* Un signal système (SIGINT/Ctrl+C).
+* Une erreur critique.
 
-### Personnaliser le Message d'Arrêt
-Il est possible d'ajouter un message personnalisé à une raison d'arrêt.
-```java
-// Dans HytaleServer.java, on voit cette utilisation :
-this.shutdownServer(ShutdownReason.CRASH.withMessage("Failed to start server!"));
-```
+## Cycle d'Arrêt
 
-## 3. Implication pour les Développeurs de Plugins
-*   **Écouter `ShutdownEvent`** : C'est la méthode la plus propre pour sauvegarder les données de votre plugin avant que le serveur ne s'éteigne complètement.
-*   **Ne pas appeler `System.exit()`** : N'arrêtez jamais le serveur vous-même. Utilisez `HytaleServer.get().shutdownServer(...)` si vous devez absolument provoquer un arrêt.
+1. **Désactivation du réseau** : Le serveur arrête d'accepter de nouvelles connexions.
+2. **Kick des joueurs** : Tous les joueurs sont déconnectés avec un message de fermeture.
+3. **Arrêt des plugins** : La méthode `shutdown()` de chaque plugin est appelée.
+4. **Sauvegarde des mondes** : Tous les chunks et entités sont sauvegardés sur le disque.
+5. **Arrêt des threads** : Les threads de travail (workers) sont terminés.
+6. **Fermeture de la JVM**.
+
+## Bonnes Pratiques pour les Plugins
+
+Dans votre méthode `shutdown()` :
+
+* Arrêtez tous vos threads et timers (`ScheduledExecutorService`).
+* Fermez les connexions aux bases de données.
+* Sauvegardez vos données si ce n'est pas fait automatiquement.

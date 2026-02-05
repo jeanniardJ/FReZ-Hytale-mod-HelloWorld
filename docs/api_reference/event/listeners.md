@@ -18,6 +18,9 @@ public class MyListener {
 ## Enregistrer un Listener
 L'enregistrement se fait dans la méthode `start()` de votre classe principale (`JavaPlugin`).
 
+### 1. Enregistrement Standard (`register`)
+C'est la méthode la plus courante. Elle enregistre un écouteur pour un événement spécifique.
+
 ```java
 @Override
 public void start() {
@@ -28,37 +31,39 @@ public void start() {
 }
 ```
 
+### 2. Enregistrement Global (`registerGlobal`)
+Cette méthode permet d'écouter un événement **partout**, indépendamment du contexte (monde, joueur, etc.). C'est utile pour les plugins qui doivent surveiller l'ensemble du serveur.
+
+```java
+// Écoute l'événement sur tous les mondes/contextes
+getEventRegistry().registerGlobal(MyGlobalEvent.class, listener::onGlobalAction);
+```
+
+### 3. Enregistrement Asynchrone (`registerAsync`)
+Pour les tâches lourdes qui ne doivent pas bloquer le serveur (ex: requêtes base de données).
+
+```java
+getEventRegistry().registerAsync(MyHeavyEvent.class, future -> {
+    return future.thenApply(event -> {
+        // Code asynchrone ici
+        return event;
+    });
+});
+```
+
 ## Liste des Événements Connus
 
 ### Joueurs
-*   `PlayerConnectEvent` : Quand un joueur se connecte.
+*   `PlayerConnectEvent` : Quand un joueur se connecte au serveur.
 *   `PlayerDisconnectEvent` : Quand un joueur se déconnecte.
-*   `PlayerTeleportEvent` : Quand un joueur est téléporté.
-    *   **Détails** : Cet événement est déclenché lors de toute téléportation d'un joueur, y compris via des portails, des commandes ou d'autres mécanismes. Il est crucial pour détecter les changements de monde.
-    *   **Accès aux données** : L'événement devrait contenir des informations sur la source et la destination de la téléportation (joueur, monde de départ, monde d'arrivée, position de départ, position d'arrivée).
-        ```java
-        import com.hypixel.hytale.server.core.event.events.player.PlayerTeleportEvent;
-        import com.hypixel.hytale.server.core.universe.PlayerRef;
-        import com.hypixel.hytale.server.core.universe.world.World; // Hypothétique
-        import com.hypixel.hytale.math.vector.Transform; // Hypothétique
-
-        public void onPlayerTeleport(PlayerTeleportEvent event) {
-            PlayerRef player = event.getPlayerRef();
-            // World fromWorld = event.getFromWorld(); // Hypothétique
-            // World toWorld = event.getToWorld();     // Hypothétique
-            // Transform fromTransform = event.getFromTransform(); // Hypothétique
-            // Transform toTransform = event.getToTransform();     // Hypothétique
-
-            // Exemple de détection de changement de monde
-            // if (!fromWorld.equals(toWorld)) {
-            //     // Le joueur a changé de monde
-            // }
-        }
-        ```
+*   `AddPlayerToWorldEvent` : Quand un joueur est ajouté à un monde (connexion ou changement de monde).
+    *   **Utilité** : Idéal pour détecter les changements de monde.
+    *   **Données** : Contient le joueur (`Holder`) et le monde cible (`World`).
 
 ### Mondes
 *   `AddWorldEvent` : Quand un nouveau monde est ajouté.
 *   `RemoveWorldEvent` : Quand un monde est supprimé.
 *   `AllWorldsLoadedEvent` : Quand tous les mondes ont fini de charger au démarrage.
+*   `DiscoverZoneEvent` : Quand un joueur découvre une nouvelle zone.
 
 *(Liste à compléter)*

@@ -7,13 +7,17 @@ import com.jjeanniard.plugins.config.WelcomeToServerConfig;
  * Son seul but est de décider quel message afficher (Premier join ou Retour).
  */
 public final class WelcomeService {
-    private final String firstJoinMessage;
-    private final String rejoinMessage;
+    private String firstJoinMessage;
+    private String rejoinMessage;
 
     // Injection de dépendance : On lui donne la config, il en extrait ce qu'il veut.
     public WelcomeService(WelcomeToServerConfig config) {
+        this.updateConfig(config);
+    }
+
+    public void updateConfig(WelcomeToServerConfig config) {
         this.firstJoinMessage = config.getFirstJoin();
-        this.rejoinMessage = config.getFirstJoin();
+        this.rejoinMessage = config.getRejoin();
     }
 
     /**

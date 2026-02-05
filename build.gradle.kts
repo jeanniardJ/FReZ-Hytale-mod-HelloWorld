@@ -20,7 +20,8 @@ repositories {
 dependencies {
     //compileOnly("com.hytale:server-api:1.0.0")
     // Hytale Server API (provided by server at runtime)
-    compileOnly(files("C:\\Users\\jonat\\AppData\\Roaming\\Hytale\\install\\release\\package\\game\\latest\\Server\\HytaleServer.jar"))
+    val hytaleServerJar = files("C:\\Users\\jonat\\AppData\\Roaming\\Hytale\\install\\release\\package\\game\\latest\\Server\\HytaleServer.jar")
+    compileOnly(hytaleServerJar)
 
     // Common dependencies (will be bundled in JAR)
     implementation("com.google.guava:guava:32.1.3-jre")
@@ -29,6 +30,9 @@ dependencies {
     // Test dependencies
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    
+    // Make Hytale API available for tests
+    testImplementation(hytaleServerJar)
 }
 
 // Configure server testing
