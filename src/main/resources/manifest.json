@@ -2,7 +2,7 @@
   "Group": "Jjeanniard",
   "Name": "HelloWorld",
   "Version": "2.0.0",
-  "Description": "A Hytale plugin",
+  "Description": "Un mod de gestion d'annonces pour Hytale.",
   "Authors": [
     {
       "Name": "Jjeanniard",
@@ -10,7 +10,7 @@
       "Url": "https://jonathanjeanniard.me"
     }
   ],
-  "Website": "https://github.com/Jjeanniard",
+  "Website": "https://github.com/jeanniardJ/FReZ-Hytale-mod-HelloWorld",
   "Main": "com.jjeanniard.plugins.HelloWorld",
   "ServerVersion": "*",
   "Dependencies": {},

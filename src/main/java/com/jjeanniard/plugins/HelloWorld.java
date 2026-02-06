@@ -1,6 +1,5 @@
 package com.jjeanniard.plugins;
 
-import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.event.events.player.AddPlayerToWorldEvent;
 import com.hypixel.hytale.server.core.event.events.player.PlayerConnectEvent;
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
@@ -35,7 +34,6 @@ public final class HelloWorld extends JavaPlugin {
     // Nos services (logique métier).
     private AnnouncementManagerService announcementService;
     private WelcomeService welcomeService;
-    private PlayerListener playerListener;
 
     /**
      * Constructeur : Appelé quand Hytale DÉCOUVRE le plugin (avant le démarrage du serveur).
@@ -67,6 +65,7 @@ public final class HelloWorld extends JavaPlugin {
 
     /**
      * Récupère la configuration actuelle du plugin.
+     *
      * @return L'objet MyConfig contenant les données de configuration.
      */
     public MyConfig getConfigData() {
@@ -110,7 +109,7 @@ public final class HelloWorld extends JavaPlugin {
                     new UniverseAnnouncementProvider(cfg.announceUniverseConfig)
             );
             this.welcomeService = new WelcomeService(cfg.welcomeConfig);
-            this.playerListener = new PlayerListener(welcomeService);
+            PlayerListener playerListener = new PlayerListener(welcomeService);
 
             // 3. Enregistrement des commandes
             getCommandRegistry().registerCommand(new AnnouncementCommand(this.announcementService));
@@ -154,12 +153,12 @@ public final class HelloWorld extends JavaPlugin {
     public void reload() {
         // Recharger la configuration depuis le disque
         MyConfig cfg = config.get();
-        
+
         // Mettre à jour le service de bienvenue
         if (welcomeService != null) {
             welcomeService.updateConfig(cfg.welcomeConfig);
         }
-        
+
         // Mettre à jour le service d'annonces
         // Note: Pour une vraie mise à jour complète (changement d'intervalle, etc.),
         // il faudrait peut-être redémarrer le service ou avoir une méthode updateConfig plus complexe.
@@ -169,7 +168,7 @@ public final class HelloWorld extends JavaPlugin {
             // Pour l'instant, on recharge juste le contenu.
             announcementService.reload();
         }
-        
+
         Log.info("Configuration du plugin rechargée.");
     }
 
@@ -182,7 +181,7 @@ public final class HelloWorld extends JavaPlugin {
         }
         // Récrée et démarre le service avec la configuration mise à jour
         // Note: Cela nécessite de recharger la config depuis le disque si elle a changé
-        MyConfig cfg = config.get(); 
+        MyConfig cfg = config.get();
         this.announcementService = new AnnouncementManagerService(
                 cfg.globalAnnouncementsConfig.getInterval(),
                 new GlobalAnnouncementProvider(cfg.globalAnnouncementsConfig),
@@ -194,15 +193,16 @@ public final class HelloWorld extends JavaPlugin {
 
     /**
      * Met à jour la configuration globale avec une nouvelle liste d'annonces.
+     *
      * @param globalMessages La nouvelle liste de messages globaux.
      */
     public void updateGlobalAnnouncements(java.util.List<String> globalMessages) {
         // On récupère l'objet de configuration actuel
         MyConfig currentConfig = config.get();
-        
+
         // On met à jour le tableau d'annonces globales
         currentConfig.globalAnnouncementsConfig.setStringArray(globalMessages.toArray(new String[0]));
-        
+
         // On sauvegarde la configuration sur le disque
         config.save().thenRun(() -> {
             Log.info("Configuration sauvegardée avec succès.");
@@ -214,15 +214,16 @@ public final class HelloWorld extends JavaPlugin {
 
     /**
      * Met à jour la configuration des annonces par univers.
+     *
      * @param worldAnnouncements La nouvelle map des annonces par monde.
      */
     public void updateUniverseAnnouncements(java.util.Map<String, String[]> worldAnnouncements) {
         // On récupère l'objet de configuration actuel
         MyConfig currentConfig = config.get();
-        
+
         // On met à jour la map d'annonces par univers
         currentConfig.announceUniverseConfig.setWorldAnnouncements(worldAnnouncements);
-        
+
         // On sauvegarde la configuration sur le disque
         config.save().thenRun(() -> {
             Log.info("Configuration des univers sauvegardée avec succès.");
