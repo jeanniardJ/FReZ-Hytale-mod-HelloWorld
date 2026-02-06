@@ -1,29 +1,3 @@
-@TitleStyle = LabelStyle(
-  FontSize: 16,
-  TextColor: #bfcdd5,
-  HorizontalAlignment: Center,
-  RenderBold: true,
-  RenderUppercase: true
-);
-
-@LabelStyle = LabelStyle(
-  FontSize: 12,
-  TextColor: #6b7a8c
-);
-
-@InputStyle = InputFieldStyle(
-  Default: (Background: #1a1a1a, LabelStyle: (FontSize: 14, TextColor: #ffffff, VerticalAlignment: Center)),
-  Hovered: (Background: #2a2a2a, LabelStyle: (FontSize: 14, TextColor: #ffffff, VerticalAlignment: Center)),
-  Focused: (Background: #000000, LabelStyle: (FontSize: 14, TextColor: #ffffff, VerticalAlignment: Center)),
-  Placeholder: (FontSize: 14, TextColor: #666666, VerticalAlignment: Center)
-);
-
-@BtnStyle = TextButtonStyle(
-  Default: (Background: #333333, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Hovered: (Background: #444444, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Pressed: (Background: #222222, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center))
-);
-
 Group {
   LayoutMode: Center;
 
@@ -38,7 +12,13 @@ Group {
 
       Label #title {
         Text: "ÉDITER L'ANNONCE";
-        Style: @TitleStyle;
+        Style: LabelStyle(
+          FontSize: 16,
+          TextColor: #bfcdd5,
+          HorizontalAlignment: Center,
+          RenderBold: true,
+          RenderUppercase: true
+        );
       }
     }
 
@@ -55,7 +35,10 @@ Group {
 
       Label {
         Text: "Message";
-        Style: @LabelStyle;
+        Style: LabelStyle(
+          FontSize: 12,
+          TextColor: #6b7a8c
+        );
         Anchor: (Bottom: 5);
       }
 
@@ -66,13 +49,17 @@ Group {
 
         TextField #messageInput {
           Anchor: (Height: 24);
-          Style: @InputStyle;
+          // Style simplifié pour éviter le crash
+          Style: (FontSize: 14, TextColor: #ffffff);
         }
       }
 
       Label {
         Text: "Monde Cible (Laisser vide pour Global)";
-        Style: @LabelStyle;
+        Style: LabelStyle(
+          FontSize: 12,
+          TextColor: #6b7a8c
+        );
         Anchor: (Top: 15, Bottom: 5);
       }
 
@@ -83,7 +70,8 @@ Group {
 
         TextField #worldInput {
           Anchor: (Height: 24);
-          Style: @InputStyle;
+          // Style simplifié pour éviter le crash
+          Style: (FontSize: 14, TextColor: #ffffff);
         }
       }
 
@@ -97,14 +85,22 @@ Group {
           Text: "ANNULER";
           Anchor: (Width: 120, Height: 40, Right: 12);
           Padding: (Horizontal: 20);
-          Style: @BtnStyle;
+          Style: TextButtonStyle(
+            Default: (Background: #333333, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+            Hovered: (Background: #444444, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+            Pressed: (Background: #222222, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center))
+          );
         }
 
         TextButton #saveButton {
           Text: "SAUVEGARDER";
           Anchor: (Width: 120, Height: 40);
           Padding: (Horizontal: 20);
-          Style: @BtnStyle;
+          Style: TextButtonStyle(
+            Default: (Background: #333333, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+            Hovered: (Background: #444444, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+            Pressed: (Background: #222222, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center))
+          );
         }
 
         Label { FlexWeight: 1; }

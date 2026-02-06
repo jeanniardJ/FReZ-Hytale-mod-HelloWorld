@@ -18,7 +18,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("com.hytale:server-api:1.0.0")
+    // compileOnly("com.hytale:server-api:1.0.0")
     // Hytale Server API (provided by server at runtime)
     val hytaleServerJar =
         files("C:\\Users\\jonat\\AppData\\Roaming\\Hytale\\install\\release\\package\\game\\latest\\Server\\HytaleServer.jar")

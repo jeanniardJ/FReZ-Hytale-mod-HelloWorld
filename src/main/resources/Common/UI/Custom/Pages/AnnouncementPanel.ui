@@ -1,30 +1,3 @@
-@TitleStyle = LabelStyle(
-  FontSize: 16,
-  TextColor: #bfcdd5,
-  HorizontalAlignment: Center,
-  RenderBold: true,
-  RenderUppercase: true
-);
-
-@HeaderStyle = LabelStyle(
-  FontSize: 14,
-  TextColor: #bfcdd5,
-  RenderBold: true
-);
-
-@HeaderCenterStyle = LabelStyle(
-  FontSize: 14,
-  TextColor: #bfcdd5,
-  RenderBold: true,
-  HorizontalAlignment: Center
-);
-
-@AddButtonStyle = TextButtonStyle(
-  Default: (Background: #2563eb, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Hovered: (Background: #3b82f6, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
-  Pressed: (Background: #1d4ed8, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center))
-);
-
 Group {
   LayoutMode: Center;
 
@@ -40,17 +13,33 @@ Group {
       Label #title {
         Text: "GESTION DES ANNONCES";
         FlexWeight: 1;
-        Style: @TitleStyle;
+        Style: LabelStyle(
+          FontSize: 16,
+          TextColor: #bfcdd5,
+          HorizontalAlignment: Center,
+          RenderBold: true,
+          RenderUppercase: true
+        );
       }
 
       TextButton #refreshButton {
         Text: "R";
         Anchor: (Width: 30, Height: 30);
+        Style: TextButtonStyle(
+            Default: (Background: #333333, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+            Hovered: (Background: #444444, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+            Pressed: (Background: #222222, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center))
+        );
       }
 
       TextButton #closeButton {
         Text: "X";
         Anchor: (Width: 30, Height: 30, Left: 5);
+        Style: TextButtonStyle(
+            Default: (Background: #333333, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+            Hovered: (Background: #444444, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+            Pressed: (Background: #222222, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center))
+        );
       }
     }
 
@@ -72,19 +61,32 @@ Group {
         Label {
           Text: "Message";
           FlexWeight: 3;
-          Style: @HeaderStyle;
+          Style: LabelStyle(
+            FontSize: 14,
+            TextColor: #bfcdd5,
+            RenderBold: true
+          );
         }
 
         Label {
           Text: "Monde";
           FlexWeight: 1;
-          Style: @HeaderStyle;
+          Style: LabelStyle(
+            FontSize: 14,
+            TextColor: #bfcdd5,
+            RenderBold: true
+          );
         }
 
         Label {
           Text: "Actions";
           FlexWeight: 1;
-          Style: @HeaderCenterStyle;
+          Style: LabelStyle(
+            FontSize: 14,
+            TextColor: #bfcdd5,
+            RenderBold: true,
+            HorizontalAlignment: Center
+          );
         }
       }
 
@@ -102,7 +104,11 @@ Group {
           Text: "AJOUTER UNE ANNONCE";
           Anchor: (Width: 200, Height: 40);
           Padding: (Horizontal: 20);
-          Style: @AddButtonStyle;
+          Style: TextButtonStyle(
+            Default: (Background: #2563eb, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+            Hovered: (Background: #3b82f6, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center)),
+            Pressed: (Background: #1d4ed8, LabelStyle: (FontSize: 14, TextColor: #ffffff, HorizontalAlignment: Center, VerticalAlignment: Center))
+          );
         }
       }
     }

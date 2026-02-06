@@ -10,15 +10,16 @@ import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
+import com.jjeanniard.plugins.HelloWorld;
 import com.jjeanniard.plugins.Log;
+import com.jjeanniard.plugins.config.MyConfig;
 import com.jjeanniard.plugins.providers.Announcement;
 import com.jjeanniard.plugins.providers.AnnouncementProvider;
+import com.jjeanniard.plugins.providers.GlobalAnnouncementProvider;
+import com.jjeanniard.plugins.providers.UniverseAnnouncementProvider;
 import com.jjeanniard.plugins.ui.AnnouncementPanelPage;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -34,41 +35,35 @@ import java.util.stream.Collectors;
  */
 public class AnnouncementManagerService {
     private final int interval;
-    // Le "Scheduler" est notre horloge interne.
     private final ScheduledExecutorService scheduler;
-
-    // La tâche planifiée (pour pouvoir l'annuler plus tard).
     private ScheduledFuture<?> scheduledTask;
+    private List<Announcement> announcements;
 
-    private List<Announcement> announcements = new ArrayList<>();
-
-    private final List<AnnouncementProvider> providers;
-
-    // Injection de dépendance : On lui donne la config, il en extrait ce qu'il veut.
     public AnnouncementManagerService(int interval, AnnouncementProvider... announcementProvider) {
         this.interval = interval;
         this.scheduler = Executors.newSingleThreadScheduledExecutor();
-        // Ensure the list is mutable by wrapping it in ArrayList
-        this.announcements = new ArrayList<>(Arrays.stream(announcementProvider)
+        List<AnnouncementProvider> providers = Arrays.asList(announcementProvider);
+        this.announcements = loadAnnouncementsFromProviders(providers);
+    }
+
+    private List<Announcement> loadAnnouncementsFromProviders(List<AnnouncementProvider> providers) {
+        return providers.stream()
                 .flatMap(provider -> provider.getAnnouncements().stream())
-                .collect(Collectors.toList()));
-        this.providers = Arrays.asList(announcementProvider);
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     public void start() {
-
-        if (announcements == null) {
+        if (announcements.isEmpty()) {
             Log.warning("Aucune annonce configurée. Le service ne démarrera pas.");
             return;
         }
 
         Log.info("Démarrage du service d'annonces (Intervalle: " + this.interval + " secondes)");
-        // On dit au scheduler : "Exécute la méthode 'broadcastNextMessage' toutes les X secondes".
         this.scheduledTask = scheduler.scheduleAtFixedRate(
-                this::broadcastNextMessage, // La méthode à appeler
-                interval,                   // Délai avant la première exécution
-                interval,                   // Délai entre chaque exécution suivante
-                TimeUnit.SECONDS            // Unité de temps
+                this::broadcastNextMessage,
+                interval,
+                interval,
+                TimeUnit.SECONDS
         );
     }
 
@@ -79,120 +74,88 @@ public class AnnouncementManagerService {
     }
 
     private void broadcastNextMessage() {
-        String worldNameAnnounce = null;
         try {
             if (announcements.isEmpty()) return;
 
-            // On choisit un message au hasard
-            int random = (int) (Math.random() * announcements.size());
-            Announcement announcement = announcements.get(random);
+            Announcement announcement = announcements.get((int) (Math.random() * announcements.size()));
+            String targetWorld = announcement.targetWorld();
+            String formattedMessage = formattedRaw(announcement.message());
 
-            if (announcement.targetWorld() != null && !announcement.targetWorld().isEmpty()) {
-                World worldOpt = Universe.get().getWorld(announcement.targetWorld());
-                worldNameAnnounce = announcement.targetWorld();
-                if (worldOpt == null) {
-                    Log.warning("Une liste d'annonce à été créé pour un univers, mais cette univers '" + announcement.targetWorld() + "' n'existe pas !");
-                    return;
-                }
-
-                worldOpt.getPlayerRefs().forEach(playerRef -> {
-                    playerRef.sendMessage(Message.raw("[Annonce]: " + formattedRaw(announcement.message())));
-                });
+            if (targetWorld != null && !targetWorld.isEmpty() && !"Global".equalsIgnoreCase(targetWorld)) {
+                broadcastToWorld(targetWorld, formattedMessage);
             } else {
-                worldNameAnnounce = "Global";
-                Universe.get().sendMessage(Message.raw("[Annonce]: " + formattedRaw(announcement.message())));
+                broadcastGlobal(formattedMessage);
             }
 
-            Log.debug("Annonce envoyée : %s pour l'univers " + worldNameAnnounce, formattedRaw(announcement.message()));
+            Log.debug("Annonce envoyée : %s pour l'univers %s", formattedMessage, targetWorld == null ? "Global" : targetWorld);
         } catch (Exception e) {
             Log.warning("Erreur dans la boucle d'annonce : %s", e.getMessage());
         }
+    }
+
+    private void broadcastToWorld(String worldName, String message) {
+        World world = Universe.get().getWorld(worldName);
+        if (world == null) {
+            Log.warning("Une annonce cible l'univers '" + worldName + "' qui n'existe pas !");
+            return;
+        }
+        world.getPlayerRefs().forEach(playerRef -> playerRef.sendMessage(Message.raw("[Annonce]: " + message)));
+    }
+
+    private void broadcastGlobal(String message) {
+        Universe.get().sendMessage(Message.raw("[Annonce]: " + message));
     }
 
     private String formattedRaw(String message) {
         int onlinePlayerCount = Universe.get().getPlayerCount();
         int maxPlayers = HytaleServer.get().getConfig().getMaxPlayers();
 
-        if (message.contains("{online}")) {
-            return message.replace("{online}", String.valueOf(onlinePlayerCount));
-        }
-
-        if (message.contains("{playersMax}")) {
-            return message.replace("{playersMax}", String.valueOf(maxPlayers));
-        }
-
-        return message;
+        return message.replace("{online}", String.valueOf(onlinePlayerCount))
+                .replace("{playersMax}", String.valueOf(maxPlayers));
     }
 
-    /**
-     * Recharge la liste des annonces depuis les providers (fichiers de config)
-     * sans arrêter le timer de diffusion.
-     */
     public void reload() {
         try {
-            // On crée une nouvelle liste temporaire pour éviter les problèmes de concurrence
-            // si le timer essaie de lire la liste pendant qu'on la vide.
-            List<Announcement> newAnnouncements = new ArrayList<>();
-
-            // On récupère la configuration fraîchement rechargée depuis le disque
-            com.jjeanniard.plugins.HelloWorld plugin = com.jjeanniard.plugins.HelloWorld.getInstance();
-            if (plugin != null) {
-                com.jjeanniard.plugins.config.MyConfig config = plugin.getConfigData();
-                
-                // On recrée temporairement les providers avec la nouvelle config pour extraire les annonces
-                AnnouncementProvider globalProvider = new com.jjeanniard.plugins.providers.GlobalAnnouncementProvider(config.globalAnnouncementsConfig);
-                AnnouncementProvider universeProvider = new com.jjeanniard.plugins.providers.UniverseAnnouncementProvider(config.announceUniverseConfig);
-                
-                newAnnouncements.addAll(globalProvider.getAnnouncements());
-                newAnnouncements.addAll(universeProvider.getAnnouncements());
-            } else {
-                // Fallback sur les providers existants (qui peuvent avoir une vieille config)
-                for (AnnouncementProvider announcementProvider : providers) {
-                    newAnnouncements.addAll(announcementProvider.getAnnouncements());
-                }
+            HelloWorld plugin = HelloWorld.getInstance();
+            if (plugin == null) {
+                Log.warning("Impossible de recharger : Instance du plugin introuvable.");
+                return;
             }
-            
-            // On remplace la liste atomiquement (ou presque, c'est une référence)
-            this.announcements = newAnnouncements;
+
+            MyConfig config = plugin.getConfigData();
+            List<AnnouncementProvider> newProviders = Arrays.asList(
+                    new GlobalAnnouncementProvider(config.globalAnnouncementsConfig),
+                    new UniverseAnnouncementProvider(config.announceUniverseConfig)
+            );
+
+            this.announcements = loadAnnouncementsFromProviders(newProviders);
+            Log.info("Annonces rechargées ! Total : " + announcements.size());
 
         } catch (Exception e) {
             Log.warning("Erreur lors du rechargement des annonces : %s", e.getMessage());
-            return;
         }
-        
-        Log.info("Annonces rechargées ! Total : " + announcements.size());
     }
 
     public void list(CommandContext commandContext) {
-        for (Announcement announcements : announcements) {
-            //Il faut lister par type les annonces
-            commandContext.sendMessage(Message.raw(announcements.toString()));
+        for (Announcement announcement : announcements) {
+            commandContext.sendMessage(Message.raw(announcement.toString()));
         }
     }
 
-    /**
-     * Ouvre le panneau de gestion des annonces pour le joueur.
-     * Cette méthode respecte l'architecture ECS en récupérant le monde via le Store de l'entité.
-     */
     public void sendManagementPanel(CommandContext ctx) {
         if (!ctx.isPlayer()) {
             ctx.sendMessage(Message.raw("Cette commande doit être exécutée par un joueur."));
             return;
         }
-        
-        // On récupère le joueur et son monde
+
         Player playerComponent = ctx.senderAs(Player.class);
         Ref<EntityStore> ref = ctx.senderAsPlayerRef();
+        assert ref != null;
         Store<EntityStore> store = ref.getStore();
-        
-        // IMPORTANT : On récupère le monde depuis le Store de l'entité
         World world = store.getExternalData().getWorld();
 
-        // On exécute la logique sur le thread du monde pour éviter l'erreur "Assert not in thread!"
         world.execute(() -> {
-            // Récupération du composant PlayerRef depuis le Store (maintenant safe)
             PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
-
             AnnouncementPanelPage page = new AnnouncementPanelPage(playerRef, this);
             playerComponent.getPageManager().openCustomPage(ref, store, page);
         });
@@ -218,18 +181,43 @@ public class AnnouncementManagerService {
     }
 
     public void deleteAnnouncement(UUID id) {
-        announcements.removeIf(a -> a.id().equals(id));
-        saveConfig();
+        if (announcements.removeIf(a -> a.id().equals(id))) {
+            saveConfig();
+        }
+    }
+
+    public boolean deleteAnnouncementByIndex(int index) {
+        if (index >= 0 && index < announcements.size()) {
+            announcements.remove(index);
+            saveConfig();
+            return true;
+        }
+        return false;
+    }
+
+    public Announcement getAnnouncementByIndex(int index) {
+        if (index >= 0 && index < announcements.size()) {
+            return announcements.get(index);
+        }
+        return null;
     }
 
     public Announcement getAnnouncement(UUID id) {
-        return announcements.stream().filter(a -> a.id().equals(id)).findFirst().orElse(null);
+        return announcements.stream()
+                .filter(a -> a.id().equals(id))
+                .findFirst()
+                .orElse(null);
     }
 
     private void saveConfig() {
-        // Mise à jour de la configuration globale
+        HelloWorld plugin = HelloWorld.getInstance();
+        if (plugin == null) {
+            Log.warning("Impossible de sauvegarder la configuration : Instance du plugin introuvable.");
+            return;
+        }
+
         List<String> globalMessages = new ArrayList<>();
-        java.util.Map<String, List<String>> universeMessages = new java.util.HashMap<>();
+        Map<String, List<String>> universeMessages = new HashMap<>();
 
         for (Announcement a : announcements) {
             if (a.targetWorld() == null || a.targetWorld().isEmpty() || "Global".equalsIgnoreCase(a.targetWorld())) {
@@ -238,23 +226,13 @@ public class AnnouncementManagerService {
                 universeMessages.computeIfAbsent(a.targetWorld(), k -> new ArrayList<>()).add(a.message());
             }
         }
-        
-        // Récupération de l'instance principale pour accéder à la config
-        com.jjeanniard.plugins.HelloWorld plugin = com.jjeanniard.plugins.HelloWorld.getInstance();
-        if (plugin != null) {
-            // Sauvegarde des annonces globales
-            plugin.updateGlobalAnnouncements(globalMessages);
-            
-            // Sauvegarde des annonces par univers
-            // Conversion de Map<String, List<String>> vers Map<String, String[]>
-            java.util.Map<String, String[]> universeConfigMap = new java.util.HashMap<>();
-            for (java.util.Map.Entry<String, List<String>> entry : universeMessages.entrySet()) {
-                universeConfigMap.put(entry.getKey(), entry.getValue().toArray(new String[0]));
-            }
-            plugin.updateUniverseAnnouncements(universeConfigMap);
-            
-        } else {
-            Log.warning("Impossible de sauvegarder la configuration : Instance du plugin introuvable.");
+
+        plugin.updateGlobalAnnouncements(globalMessages);
+
+        Map<String, String[]> universeConfigMap = new HashMap<>();
+        for (Map.Entry<String, List<String>> entry : universeMessages.entrySet()) {
+            universeConfigMap.put(entry.getKey(), entry.getValue().toArray(new String[0]));
         }
+        plugin.updateUniverseAnnouncements(universeConfigMap);
     }
 }

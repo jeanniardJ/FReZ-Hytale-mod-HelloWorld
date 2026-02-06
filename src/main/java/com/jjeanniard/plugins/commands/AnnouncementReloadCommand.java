@@ -15,21 +15,12 @@ public class AnnouncementReloadCommand extends AbstractCommand {
 
     public AnnouncementReloadCommand() {
         super("reload", "Recharge la configuration du plugin");
+        // Explicit permission
+        requirePermission(Permissions.ADMIN_RELOAD);
     }
 
     @Override
     protected @Nullable CompletableFuture<Void> execute(@NonNull CommandContext commandContext) {
-        // Vérification permission
-        if (commandContext.isPlayer()) {
-            Player player = commandContext.senderAs(Player.class);
-             if (player != null && !player.hasPermission(Permissions.ADMIN_RELOAD)) {
-                commandContext.sendMessage(Message.raw("§cVous n'avez pas la permission de recharger ce plugin."));
-                return CompletableFuture.completedFuture(null);
-            }
-        } else {
-            // Console a toujours la permission
-        }
-
         HelloWorld.getInstance().reload();
         commandContext.sendMessage(Message.raw("§aConfiguration rechargée avec succès !"));
         return CompletableFuture.completedFuture(null);

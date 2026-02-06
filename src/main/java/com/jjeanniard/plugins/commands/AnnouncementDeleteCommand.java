@@ -1,19 +1,36 @@
 package com.jjeanniard.plugins.commands;
 
-import com.hypixel.hytale.server.core.command.system.AbstractCommand;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
-import org.checkerframework.checker.nullness.qual.NonNull;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import com.hypixel.hytale.server.core.command.system.arguments.system.RequiredArg;
+import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
+import com.hypixel.hytale.server.core.command.system.basecommands.CommandBase;
+import com.jjeanniard.plugins.Permissions;
+import com.jjeanniard.plugins.services.AnnouncementManagerService;
 
-import java.util.concurrent.CompletableFuture;
+public class AnnouncementDeleteCommand extends CommandBase {
 
-public class AnnouncementDeleteCommand extends AbstractCommand {
-    public AnnouncementDeleteCommand() {
+    private final AnnouncementManagerService service;
+    private final RequiredArg<Integer> indexArg;
+
+    public AnnouncementDeleteCommand(AnnouncementManagerService service) {
         super("delete", "Supprime une annonce existante.");
+        this.service = service;
+
+        // Explicit permission
+        requirePermission(Permissions.ADMIN_MANAGE);
+
+        this.indexArg = withRequiredArg("index", "L'ID de l'annonce à supprimer", ArgTypes.INTEGER);
     }
 
     @Override
-    protected @Nullable CompletableFuture<Void> execute(@NonNull CommandContext commandContext) {
-        return null;
+    protected void executeSync(CommandContext commandContext) {
+        int index = indexArg.get(commandContext);
+
+        if (service.deleteAnnouncementByIndex(index)) {
+            commandContext.sendMessage(Message.raw("Annonce supprimée.").color("green"));
+        } else {
+            commandContext.sendMessage(Message.raw("ID invalide.").color("red"));
+        }
     }
 }
