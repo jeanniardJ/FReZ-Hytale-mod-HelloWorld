@@ -23,8 +23,7 @@ dependencies {
 
     if (isCi) {
         // Pour GitHub Actions
-        compileOnly("com.hypixel.hytale:server-api:+")
-        implementation("com.hypixel.hytale:Server:+")
+        compileOnly("com.hypixel.hytale:Server:+")
     } else {
         // Pour votre environnement local
         compileOnly(files("C:\\Users\\jonat\\AppData\\Roaming\\Hytale\\install\\release\\package\\game\\latest\\Server\\HytaleServer.jar"))
