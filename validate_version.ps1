@@ -9,12 +9,7 @@ if (-not (Test-Path $manifestPath)) {
 $manifest = Get-Content $manifestPath | ConvertFrom-Json
 $serverVersionConstraint = $manifest.ServerVersion
 
-# Extract the version number (remove >=, >, <, <=, =)
-$requiredVersion = $serverVersionConstraint -replace '[<>= ]', ''
-
-Write-Host "Version requise par le manifest : $requiredVersion"
-
-# 2. Get available versions from Hytale Maven
+# 2. Get available versions and latest version from Hytale Maven
 $metadataUrl = "https://maven.hytale.com/release/com/hypixel/hytale/Server/maven-metadata.xml"
 try {
     $metadataContent = Invoke-WebRequest -Uri $metadataUrl -UseBasicParsing -TimeoutSec 10
@@ -24,15 +19,32 @@ try {
     Write-Host $_.Exception.Message
     exit 1
 }
-
+$latestVersion = $metadata.metadata.versioning.latest
 $availableVersions = $metadata.metadata.versioning.versions.version
 
-# 3. Check if the required version exists
-if ($availableVersions -contains $requiredVersion) {
-    Write-Host "Validation réussie: La version du serveur '$requiredVersion' existe."
-    exit 0
+# 3. Perform validation based on constraint
+if ($serverVersionConstraint.StartsWith(">=")) {
+    $requiredVersion = $serverVersionConstraint -replace '>=', ''
+    Write-Host "Contrainte de version : '>=' $requiredVersion"
+    Write-Host "Dernière version disponible : $latestVersion"
+
+    # Direct string comparison works for YYYY.MM.DD-hash format
+    if ($latestVersion -ge $requiredVersion) {
+        Write-Host "Validation réussie: La dernière version '$latestVersion' est supérieure ou égale à '$requiredVersion'."
+        exit 0
+    } else {
+        Write-Host "Erreur de validation: La dernière version '$latestVersion' n'est pas supérieure ou égale à '$requiredVersion'."
+        exit 1
+    }
 } else {
-    Write-Host "Erreur de validation: La version du serveur '$requiredVersion' spécifiée dans manifest.json n'a pas été trouvée dans la liste des versions disponibles."
-    # Write-Host "Versions disponibles: $($availableVersions -join ', ')" # Uncomment for debugging
-    exit 1
+    # Simple existence check for exact version match
+    $requiredVersion = $serverVersionConstraint -replace '[<>= ]', ''
+    Write-Host "Contrainte de version : '$requiredVersion' (correspondance exacte)"
+    if ($availableVersions -contains $requiredVersion) {
+        Write-Host "Validation réussie: La version du serveur '$requiredVersion' existe."
+        exit 0
+    } else {
+        Write-Host "Erreur de validation: La version du serveur '$requiredVersion' n'a pas été trouvée."
+        exit 1
+    }
 }
