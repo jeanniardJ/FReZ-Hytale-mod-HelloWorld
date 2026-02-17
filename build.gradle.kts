@@ -11,29 +11,28 @@ description = findProperty("pluginDescription") as String? ?: "A Hytale plugin t
 
 repositories {
     mavenCentral()
+    maven { url = uri("https://jitpack.io") }
     maven {
         name = "hytale"
-        url = uri("https://repo.hytale.com/releases")
+        url = uri("https://maven.hytale.com/release") // Or "hytale-pre-release" for pre-release versions
     }
 }
 
 dependencies {
-    // compileOnly("com.hytale:server-api:1.0.0")
-    // Hytale Server API (provided by server at runtime)
-    val hytaleServerJar =
-        files("C:\\Users\\jonat\\AppData\\Roaming\\Hytale\\install\\release\\package\\game\\latest\\Server\\HytaleServer.jar")
-    compileOnly(hytaleServerJar)
+    val isCi = System.getenv("CI") == "true"
 
-    // Common dependencies (will be bundled in JAR)
+    if (isCi) {
+        // Pour GitHub Actions
+        compileOnly("com.hypixel.hytale:server-api:+")
+        implementation("com.hypixel.hytale:Server:+")
+    } else {
+        // Pour votre environnement local
+        compileOnly(files("C:\\Users\\jonat\\AppData\\Roaming\\Hytale\\install\\release\\package\\game\\latest\\Server\\HytaleServer.jar"))
+    }
+
+    // Dépendances communes
     implementation("com.google.guava:guava:32.1.3-jre")
     implementation("com.google.code.gson:gson:2.10.1")
-
-    // Test dependencies
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-
-    // Make Hytale API available for tests
-    testImplementation(hytaleServerJar)
 }
 
 // Configure server testing
