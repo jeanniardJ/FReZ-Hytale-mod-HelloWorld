@@ -1,0 +1,3 @@
+[submodule "hytale_docs"]
+	path = hytale_docs
+	url = https://github.com/jeanniardJ/FReZ-Hytale-mod-Docs.git
