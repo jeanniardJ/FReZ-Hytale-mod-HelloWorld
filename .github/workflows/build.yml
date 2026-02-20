@@ -38,10 +38,15 @@ jobs:
       - name: Run Tests
         run: ./gradlew test -PpluginVersion=${{ env.PLUGIN_VERSION }}
 
+      # ↓ Nouveau step
+      - name: Find JAR path
+        id: jar
+        run: echo "path=$(ls build/libs/*.jar)" >> $GITHUB_OUTPUT
+
       - uses: actions/upload-artifact@v4
         with:
           name: plugin-jar
-          path: build/libs/*.jar
+          path: ${{ steps.jar.outputs.path }}
 
       - name: Upload to CurseForge
         if: github.ref == 'refs/heads/main'
@@ -50,6 +55,6 @@ jobs:
           token: ${{ secrets.CURSEFORGE }}
           project_id: ${{ secrets.CURSEFORGE_PROJECT_ID }}
           game_endpoint: hytale
-          file_path: build/libs/*.jar
+          file_path: ${{ steps.jar.outputs.path }}
           changelog: ${{ github.event.head_commit.message }}
           display_name: HelloWorld-${{ env.PLUGIN_VERSION }}
