@@ -1,0 +1,19 @@
+# .pkgmeta (nouveau fichier)
+display-name: FReZ-HelloWorld
+version: '@project-version@'
+game-versions:
+  - '@project-version@'
+release-type: release  # auto alpha/beta via tag
+
+ignore: 
+  - .git*
+  - .github/
+  - gradle/
+  - build/
+  - buildSrc/
+  - hytale_docs/
+  - validate_version.ps1
+  - .whitesource
+
+license: LICENSE
+changelog: CHANGELOG.md
