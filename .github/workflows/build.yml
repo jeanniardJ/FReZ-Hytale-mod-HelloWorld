@@ -50,11 +50,9 @@ jobs:
 
       - name: Upload to CurseForge
         if: github.ref == 'refs/heads/main'
-        uses: itsmeow/curseforge-upload@v3
-        with:
-          token: ${{ secrets.CURSEFORGE }}
-          project_id: ${{ secrets.CURSEFORGE_PROJECT_ID }}
-          game_endpoint: hytale
-          file_path: ${{ steps.jar.outputs.path }}
-          changelog: ${{ github.event.head_commit.message }}
-          display_name: HelloWorld-${{ env.PLUGIN_VERSION }}
+        run: |
+          curl -X POST \
+            -H "X-Api-Token: ${{ secrets.CURSEFORGE }}" \
+            -F "metadata={\"projectID\":${{ secrets.CURSEFORGE_PROJECT_ID }},\"displayName\":\"HelloWorld-${{ env.PLUGIN_VERSION }}\",\"changelog\":\"${{ github.event.head_commit.message }}\",\"releaseType\":\"release\"};type=application/json" \
+            -F "file=@${{ steps.jar.outputs.path }}" \
+            https://www.curseforge.com/api/projects/${{ secrets.CURSEFORGE_PROJECT_ID }}/upload-file
