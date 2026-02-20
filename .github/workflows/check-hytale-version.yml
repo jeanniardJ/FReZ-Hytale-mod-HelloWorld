@@ -2,8 +2,8 @@ name: Check & Update Hytale ServerVersion
 
 on:
   schedule:
-    - cron: '0 6 * * *'   # Chaque jour à 6h UTC
-  workflow_dispatch:        # Déclenchement manuel possible
+    - cron: '0 6 * * *'
+  workflow_dispatch:
 
 jobs:
   check-version:
@@ -43,14 +43,21 @@ jobs:
           echo "current_version=$CURRENT" >> $GITHUB_OUTPUT
           echo "📄 Version actuelle dans manifest : $CURRENT"
 
+      # ↓ Seul ce step est modifié
       - name: Update manifest.json if version changed
         if: steps.fetch_version.outputs.new_version != steps.current_version.outputs.current_version
         run: |
-          jq --arg v "${{ steps.fetch_version.outputs.new_version }}" \
-            '.ServerVersion = $v' \
+          BUILD_DATE=$(date +'%Y%m%d')
+          BASE_VERSION=$(jq -r '.Version' src/main/resources/manifest.json | cut -d'+' -f1)
+
+          jq --arg sv "${{ steps.fetch_version.outputs.new_version }}" \
+             --arg pv "${BASE_VERSION}+${BUILD_DATE}" \
+            '.ServerVersion = $sv | .Version = $pv' \
             src/main/resources/manifest.json > tmp.json \
             && mv tmp.json src/main/resources/manifest.json
-          echo "🔄 manifest.json mis à jour → ${{ steps.fetch_version.outputs.new_version }}"
+
+          echo "🔄 ServerVersion → ${{ steps.fetch_version.outputs.new_version }}"
+          echo "🔄 Version       → ${BASE_VERSION}+${BUILD_DATE}"
 
       - name: Commit & Push if changed
         if: steps.fetch_version.outputs.new_version != steps.current_version.outputs.current_version

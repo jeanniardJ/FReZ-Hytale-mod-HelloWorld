@@ -12,7 +12,7 @@
   ],
   "Website": "https://github.com/jeanniardJ/FReZ-Hytale-mod-HelloWorld",
   "Main": "com.jjeanniard.plugins.HelloWorld",
-  "ServerVersion": ">=2026.01.28-87d03be09",
+  "ServerVersion": "2026.01.28-87d03be09",
   "Dependencies": {},
   "OptionalDependencies": {},
   "DisabledByDefault": false,
