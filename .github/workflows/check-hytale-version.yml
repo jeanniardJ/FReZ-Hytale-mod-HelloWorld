@@ -12,7 +12,7 @@ jobs:
       contents: write
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GIT_COMMIT_TOKEN }}
           ref: develop
@@ -25,14 +25,13 @@ jobs:
 
       - name: Restore OAuth2 credentials
         run: |
-          mkdir -p ~/.config/hytale
           echo "${{ secrets.HYTALE_DOWNLOADER_CREDENTIALS }}" \
-            | base64 -d > ~/.config/hytale/credentials.json
+            | base64 -d > .hytale-downloader-credentials.json
 
       - name: Fetch latest Hytale ServerVersion
         id: fetch_version
         run: |
-          NEW_VERSION=$(./hytale-downloader-linux-amd64 -print-version)
+          NEW_VERSION=$(./hytale-downloader-linux-amd64 -print-version -skip-update-check)
           echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "✅ Version Hytale détectée : $NEW_VERSION"
 
