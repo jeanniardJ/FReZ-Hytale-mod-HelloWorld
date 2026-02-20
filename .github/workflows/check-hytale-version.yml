@@ -1,0 +1,62 @@
+name: Check & Update Hytale ServerVersion
+
+on:
+  schedule:
+    - cron: '0 6 * * *'   # Chaque jour à 6h UTC
+  workflow_dispatch:        # Déclenchement manuel possible
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          token: ${{ secrets.GIT_COMMIT_TOKEN }}
+          ref: develop
+
+      - name: Install hytale-downloader
+        run: |
+          wget -q https://downloader.hytale.com/hytale-downloader.zip
+          unzip hytale-downloader.zip
+          chmod +x hytale-downloader-linux-amd64
+
+      - name: Restore OAuth2 credentials
+        run: |
+          mkdir -p ~/.config/hytale
+          echo "${{ secrets.HYTALE_DOWNLOADER_CREDENTIALS }}" \
+            | base64 -d > ~/.config/hytale/credentials.json
+
+      - name: Fetch latest Hytale ServerVersion
+        id: fetch_version
+        run: |
+          NEW_VERSION=$(./hytale-downloader-linux-amd64 -print-version)
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "✅ Version Hytale détectée : $NEW_VERSION"
+
+      - name: Read current ServerVersion in manifest
+        id: current_version
+        run: |
+          CURRENT=$(jq -r '.ServerVersion' src/main/resources/manifest.json)
+          echo "current_version=$CURRENT" >> $GITHUB_OUTPUT
+          echo "📄 Version actuelle dans manifest : $CURRENT"
+
+      - name: Update manifest.json if version changed
+        if: steps.fetch_version.outputs.new_version != steps.current_version.outputs.current_version
+        run: |
+          jq --arg v "${{ steps.fetch_version.outputs.new_version }}" \
+            '.ServerVersion = $v' \
+            src/main/resources/manifest.json > tmp.json \
+            && mv tmp.json src/main/resources/manifest.json
+          echo "🔄 manifest.json mis à jour → ${{ steps.fetch_version.outputs.new_version }}"
+
+      - name: Commit & Push if changed
+        if: steps.fetch_version.outputs.new_version != steps.current_version.outputs.current_version
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/main/resources/manifest.json
+          git commit -m "chore: update ServerVersion → ${{ steps.fetch_version.outputs.new_version }}"
+          git push origin develop
