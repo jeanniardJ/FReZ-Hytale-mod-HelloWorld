@@ -2,8 +2,8 @@ name: Build & CurseForge Auto Packaging
 
 on:
   push:
-    branches: [ develop ]     # Build/tests
-    tags: [ 'v*', 'v*-alpha', 'v*-beta' ]  # Déclenche packaging
+    branches: [ main, develop ]
+    tags: [ 'v*', 'v*-alpha', 'v*-beta' ]
   pull_request:
     branches: [ main ]
 
@@ -26,11 +26,30 @@ jobs:
 
       - run: chmod +x gradlew
 
-      - run: ./gradlew shadowJar
+      - name: Set plugin version with date
+        run: |
+          BUILD_DATE=$(date +'%Y%m%d')
+          BASE_VERSION=$(grep "^pluginVersion" gradle.properties | cut -d'=' -f2 | cut -d'+' -f1)
+          echo "PLUGIN_VERSION=${BASE_VERSION}+${BUILD_DATE}" >> $GITHUB_ENV
 
-      - run: ./gradlew test
+      - name: Build with Gradle
+        run: ./gradlew shadowJar -PpluginVersion=${{ env.PLUGIN_VERSION }}
+
+      - name: Run Tests
+        run: ./gradlew test -PpluginVersion=${{ env.PLUGIN_VERSION }}
 
       - uses: actions/upload-artifact@v4
         with:
           name: plugin-jar
           path: build/libs/*.jar
+
+      - name: Upload to CurseForge
+        if: github.ref == 'refs/heads/main'
+        uses: itsmeow/curseforge-upload@v3
+        with:
+          token: ${{ secrets.CURSEFORGE }}
+          project_id: ${{ secrets.CURSEFORGE_PROJECT_ID }}
+          game_endpoint: hytale
+          file_path: build/libs/*.jar
+          changelog: ${{ github.event.head_commit.message }}
+          display_name: HelloWorld-${{ env.PLUGIN_VERSION }}
