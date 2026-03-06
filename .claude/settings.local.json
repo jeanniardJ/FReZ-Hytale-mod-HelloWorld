@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cmd //c \"gh pr create --base main --head develop --title \"\"feat: Integrate CI/CD refactoring and new features\"\" --body \"\"## Résumé\\\\n\\\\n- **Refactorisation du workflow de build** : simplification et optimisation de \\\\`.github/workflows/build.yml\\\\`\\\\n- **Nouveau workflow de vérification de version Hytale** : ajout de \\\\`.github/workflows/check-hytale-version.yml\\\\`\\\\n- **Ajout de \\\\`.pkgmeta\\\\`** : fichier de métadonnées pour le packaging du mod\\\\n- **Migration du sous-module docs** : remplacement de \\\\`FReZ-Hytale-mod-Docs\\\\` par \\\\`hytale_docs\\\\`\\\\n- **Script de validation de version** : ajout de \\\\`validate_version.ps1\\\\` avec support des opérateurs \\\\`>=\\\\`\\\\n- **CHANGELOG** : ajout du fichier \\\\`CHANGELOG.md\\\\`\\\\n\\\\n## Plan de test\\\\n\\\\n- [ ] Vérifier que le workflow \\\\`build.yml\\\\` se déclenche correctement sur push/PR\\\\n- [ ] Vérifier que le workflow \\\\`check-hytale-version.yml\\\\` fonctionne et détecte les nouvelles versions\\\\n- [ ] Valider que le script \\\\`validate_version.ps1\\\\` gère correctement les comparaisons de version\\\\n- [ ] Confirmer que le sous-module \\\\`hytale_docs\\\\` est bien initialisé\\\\n\\\\n🤖 Generated with [Claude Code]\\(https://claude.com/claude-code\\)\"\"\" \")",
+      "Bash(git fetch:*)",
+      "Bash(\"/c/Program Files/GitHub:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(git pull:*)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr view 8 --json state -q .state)",
+      "Bash(\"/c/Program Files/GitHub CLI/gh.exe\" pr view 9 --json state -q .state)"
+    ]
+  }
+}
